@@ -1,0 +1,238 @@
+/* layout.css 
+    Struktur Utama Sistem Internal Inspektorat
+*/
+
+:root {
+    --sidebar-width: 260px;
+    --sidebar-bg: #111827;
+    --sidebar-hover: #1f2937;
+    --sidebar-active: #3b82f6;
+    --main-bg: #f9fafb;
+    --text-muted: #9ca3af;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--main-bg);
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* --- WRAPPER UTAMA --- */
+.app-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- SIDEBAR STYLING --- */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--sidebar-bg);
+    color: white;
+    position: fixed; /* Tetap di kiri saat scroll */
+    top: 0;
+    left: 0;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    transition: var(--transition);
+}
+
+.sidebar-header {
+    padding: 1.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    font-weight: 800;
+    letter-spacing: 1px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-header i {
+    font-size: 1.5rem;
+    color: var(--sidebar-active);
+    margin-right: 12px;
+}
+
+.sidebar-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-top: 1rem;
+}
+
+/* Navigation Links */
+.sidebar-heading {
+    padding: 1.5rem 1.5rem 0.5rem;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #4b5563;
+    letter-spacing: 0.1em;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    padding: 0.8rem 1.5rem;
+    margin: 0.2rem 0.75rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.nav-link i {
+    margin-right: 12px;
+    font-size: 1.2rem;
+}
+
+.nav-link:hover {
+    background: var(--sidebar-hover);
+    color: white;
+}
+
+.nav-link.active {
+    background: var(--sidebar-active);
+    color: white;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Sidebar Footer & User Profile */
+.sidebar-footer {
+    padding: 1.25rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.user-box {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.avatar-initial {
+    width: 38px;
+    height: 38px;
+    background: var(--sidebar-active);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+}
+
+.user-info {
+    margin-left: 12px;
+    overflow: hidden;
+}
+
+.user-name {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.user-role {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* --- MAIN CONTENT AREA --- */
+.main-content {
+    /* PENTING: Margin harus sama dengan lebar sidebar */
+    margin-left: var(--sidebar-width); 
+    width: calc(100% - var(--sidebar-width));
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    transition: var(--transition);
+}
+
+/* Container di dalam main content agar grid bootstrap presisi */
+.content-body {
+    width: 100%;
+    max-width: 1400px; /* Optional: Agar tidak terlalu lebar di monitor ultra-wide */
+    margin: 0 auto;
+}
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%); /* Sembunyikan sidebar di tablet/HP */
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1.5rem;
+    }
+
+    /* Kamu bisa tambahkan class 'show' via JS nanti untuk toggle mobile menu */
+    .sidebar.show {
+        transform: translateX(0);
+    }
+
+    /* --- OVERLAY & TOGGLE UNTUK MOBILE --- */
+
+    /* Latar belakang gelap saat sidebar terbuka di HP */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1040; /* Di bawah sidebar (1050) tapi di atas konten */
+        backdrop-filter: blur(2px);
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    @media (max-width: 992px) {
+        /* Menambahkan transisi halus saat sidebar muncul */
+        .sidebar {
+            left: -260px; /* Sembunyikan ke kiri luar layar */
+            transform: none !important; /* Kita pakai properti 'left' untuk animasi lebih mulus */
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.show {
+            left: 0; /* Munculkan sidebar */
+        }
+
+        /* Tombol Close di dalam sidebar header (Hanya muncul di Mobile) */
+        .btn-close-sidebar {
+            display: block;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Sembunyikan tombol close di desktop */
+    @media (min-width: 993px) {
+        .btn-close-sidebar {
+            display: none;
+        }
+    }
+}
