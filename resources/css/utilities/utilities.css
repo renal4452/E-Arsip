@@ -1,0 +1,49 @@
+/**
+ * utilities.css — Helper Class Serba Guna (Light Mode Optimized)
+ * ─────────────────────────────────────────────────────────
+ * Helper class yang dapat dikomposisi dengan komponen lain.
+ * ─────────────────────────────────────────────────────────
+ * Bergantung pada: tokens.css
+ */
+
+@layer utilities { /* Diubah ke @layer utilities agar urutan cascade CSS lebih tepat */
+
+  /* ── TEXT GRADIENT ── */
+  /* Teks gradien emas/amber untuk judul unggulan */
+  .text-gradient-amber {
+    /* Mengubah #fcd34d (Amber 300) ke #d97706 (Amber 600) agar kontras teks lolos uji WCAG pada background terang */
+    background: linear-gradient(135deg, var(--accent) 0%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    display: inline-block; /* Memastikan clipping gradien bekerja sempurna pada elemen inline */
+  }
+
+
+  /* ── SCROLLBAR UTILITY ── */
+  /* Sembunyikan scrollbar tanpa menghilangkan kemampuan scroll */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE dan Edge */
+    scrollbar-width: none;     /* Firefox */
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;             /* Chrome, Safari, dan Opera */
+  }
+
+
+  /* ── FOCUS RING ── */
+  /* Ring fokus dua lapis dengan warna aksen (Sinkronisasi Token) */
+  .ring-accent {
+    box-shadow:
+      0 0 0 2px var(--bg-1),  /* Menggantikan var(--color-app-bg) dengan token internal */
+      0 0 0 4px var(--accent); /* Menggantikan var(--color-accent) */
+  }
+
+  /* Utilitas tambahan untuk focus-visible (opsional namun direkomendasikan) */
+  .focus-ring-safe:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--bg-1),
+      0 0 0 4px var(--accent);
+  }
+}

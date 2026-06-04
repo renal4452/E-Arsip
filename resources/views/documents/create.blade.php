@@ -14,7 +14,7 @@
     </div>
 
     @if ($errors->any())
-        <div x-data="{ show: true }" x-show="show" class="mb-8 p-5 bg-rose-50 border border-rose-200 rounded-2xl shadow-sm flex items-start gap-4">
+        <div x-data="{ show: true }" x-show="show" class="mb-8 p-5 bg-rose-50 border border-rose-200 rounded-2xl shadow-sm flex items-start gap-4" x-transition>
             <div class="mt-0.5 text-rose-500 text-2xl">
                 <i class="bi bi-exclamation-triangle-fill"></i>
             </div>
@@ -46,20 +46,32 @@
                 <form action="{{ route('documents.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     
-                    <div class="mb-6">
-                        <label for="no_doc" class="block text-sm font-bold text-slate-700 mb-2">
-                            Nomor Dokumen / Referensi <span class="text-rose-500">*</span>
-                        </label>
-                        <input type="text" name="no_doc" id="no_doc" 
-                               class="w-full px-4 py-3 rounded-xl text-sm transition-colors border focus:outline-none focus:ring-2 focus:bg-white
-                               @error('no_doc') border-rose-300 bg-rose-50 focus:border-rose-500 focus:ring-rose-500 text-rose-900 
-                               @else border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 text-slate-900 @enderror" 
-                               value="{{ old('no_doc') }}" 
-                               placeholder="Contoh: 001/SOP/HRD/2026" 
-                               required>
-                        @error('no_doc') 
-                            <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
-                        @enderror
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="md:col-span-2">
+                            <label for="no_doc" class="block text-sm font-bold text-slate-700 mb-2">
+                                Nomor Dokumen / Referensi <span class="text-rose-500">*</span>
+                            </label>
+                            <input type="text" name="no_doc" id="no_doc" 
+                                   class="w-full px-4 py-3 rounded-xl text-sm transition-colors border focus:outline-none focus:ring-2 focus:bg-white
+                                   @error('no_doc') border-rose-300 bg-rose-50 focus:border-rose-500 focus:ring-rose-500 text-rose-900 
+                                   @else border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 text-slate-900 @enderror" 
+                                   value="{{ old('no_doc') }}" 
+                                   placeholder="Contoh: 001/SOP/HRD/2026" 
+                                   required>
+                            @error('no_doc') 
+                                <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">
+                                Pengunggah Sistem
+                            </label>
+                            <div class="w-full px-4 py-3 rounded-xl text-sm border border-slate-200 bg-slate-100 text-slate-500 flex items-center gap-2 font-semibold select-none">
+                                <i class="bi bi-person-circle text-slate-400 text-base"></i>
+                                <span class="truncate">{{ auth()->user()->name ?? 'Tidak Terdeteksi' }}</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="mb-6">
@@ -78,23 +90,28 @@
                         @enderror
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" x-data="{ selectedFile: '', selectedSize: '' }">
                         <div>
                             <label for="doc_type_id" class="block text-sm font-bold text-slate-700 mb-2">
                                 Kategori Dokumen <span class="text-rose-500">*</span>
                             </label>
-                            <select name="doc_type_id" id="doc_type_id" 
-                                    class="w-full px-4 py-3 rounded-xl text-sm transition-colors border focus:outline-none focus:ring-2 focus:bg-white appearance-none
-                                    @error('doc_type_id') border-rose-300 bg-rose-50 focus:border-rose-500 focus:ring-rose-500 text-rose-900 
-                                    @else border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 text-slate-900 @enderror" 
-                                    required>
-                                <option value="" class="text-slate-400">-- Pilih Kategori --</option>
-                                @foreach($categories ?? [] as $cat)
-                                    <option value="{{ $cat->id }}" {{ old('doc_type_id') == $cat->id ? 'selected' : '' }}>
-                                        {{ $cat->name_types }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <div class="relative">
+                                <select name="doc_type_id" id="doc_type_id" 
+                                        class="w-full px-4 py-3 rounded-xl text-sm transition-colors border focus:outline-none focus:ring-2 focus:bg-white appearance-none pr-10
+                                        @error('doc_type_id') border-rose-300 bg-rose-50 focus:border-rose-500 focus:ring-rose-500 text-rose-900 
+                                        @else border-slate-200 bg-slate-50 focus:border-indigo-500 focus:ring-indigo-500 text-slate-900 @enderror" 
+                                        required>
+                                    <option value="" class="text-slate-400">-- Pilih Kategori --</option>
+                                    @foreach($categories ?? [] as $cat)
+                                        <option value="{{ $cat->id }}" {{ old('doc_type_id') == $cat->id ? 'selected' : '' }}>
+                                            {{ $cat->name_types }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                                    <i class="bi bi-chevron-down text-xs"></i>
+                                </div>
+                            </div>
                             @error('doc_type_id')
                                 <p class="mt-2 text-xs font-bold text-rose-500">{{ $message }}</p>
                             @enderror
@@ -105,12 +122,30 @@
                                 File Dokumen <span class="text-rose-500">*</span>
                             </label>
                             <input type="file" name="file" id="file" 
+                                   @change="
+                                        const file = $event.target.files[0];
+                                        if (file) {
+                                            selectedFile = file.name;
+                                            selectedSize = (file.size / 1024 / 1024).toFixed(2) + ' MB';
+                                        } else {
+                                            selectedFile = '';
+                                            selectedSize = '';
+                                        }
+                                   "
                                    class="w-full text-sm text-slate-500 border border-slate-200 rounded-xl bg-slate-50 cursor-pointer
                                    file:mr-4 file:py-3 file:px-4 file:rounded-l-xl file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-all
-                                   @error('file') border-rose-300 @enderror" 
+                                   @error('file') border-rose-300 bg-rose-50 @enderror" 
                                    required 
                                    accept=".pdf,.doc,.docx,.xls,.xlsx">
-                            <p class="mt-2 text-xs font-medium text-slate-500 flex items-center gap-1">
+                            
+                            <template x-if="selectedFile">
+                                <div class="mt-3 p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl flex items-center justify-between">
+                                    <span class="text-xs font-bold text-indigo-700 truncate max-w-[70%]" x-text="selectedFile"></span>
+                                    <span class="text-[10px] font-extrabold text-indigo-500 uppercase tracking-wider bg-white px-2 py-1 rounded-md shadow-sm border border-indigo-50/80" x-text="selectedSize"></span>
+                                </div>
+                            </template>
+
+                            <p class="mt-2 text-xs font-medium text-slate-500 flex items-center gap-1" x-show="!selectedFile">
                                 <i class="bi bi-info-circle"></i> Format: PDF, Word, atau Excel.
                             </p>
                             @error('file') 

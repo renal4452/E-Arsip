@@ -27,6 +27,12 @@ class DocVersion extends Model
         return $this->belongsTo(User::class, 'uploaded_by');
     }
 
+    public function user()
+    {
+        // Sesuaikan 'uploaded_by' dengan nama kolom ID user di tabel document_versions Anda.
+        // Jika di database namanya 'user_id', Anda cukup menulis: return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'uploaded_by');
+    }
     /**
      * Relasi kembali ke dokumen induk
      */

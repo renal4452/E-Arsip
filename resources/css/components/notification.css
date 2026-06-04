@@ -1,0 +1,223 @@
+/**
+ * notification.css — Komponen Notifikasi (Sistem Light Mode)
+ * ─────────────────────────────────────────────────────────
+ * Mengatur tampilan tombol lonceng, badge penghitung, 
+ * panel melayang, daftar item, hingga state kosong.
+ *
+ * Bergantung pada: tokens.css
+ * ─────────────────────────────────────────────────────────
+ */
+
+@layer components {
+
+  /* ── Tombol Lonceng (Pemicu Dropdown) ── */
+  .notif-bell-btn {
+    position: relative;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-2); /* Abu-abu sangat terang */
+    border: 1px solid var(--border);
+    border-radius: var(--r-full); /* Lingkaran sempurna */
+    color: var(--text-2);
+    font-size: 1.125rem;
+    cursor: pointer;
+    transition: all 0.15s var(--ease-smooth);
+  }
+  .notif-bell-btn:hover {
+    color: var(--accent); /* Berubah ke Biru Otoritas */
+    background: var(--info-dim); /* Sentuhan tint biru transparan */
+    border-color: var(--info-soft);
+  }
+  .notif-bell-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ── Badge Jumlah Notifikasi Aktif ── */
+  .notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    min-width: 1.125rem;
+    height: 1.125rem;
+    background: var(--error); /* Merah solid */
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-full);
+    padding: 0 4px;
+    border: 2px solid var(--bg-1); /* Memotong visual tombol di bawahnya dengan warna putih murni */
+    font-family: var(--font-sans);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ── Dropdown Panel (Floating Kanvas) ── */
+  .notif-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    width: 360px; /* Lebar optimal untuk membaca ringkasan pesan */
+    background: var(--bg-1); /* Putih bersih */
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl); /* Bayangan halus tapi dalam untuk Light Mode */
+    transform-origin: top right;
+    z-index: 50;
+  }
+
+  /* ── Dropdown Header ── */
+  .notif-dropdown-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2); /* Background header sedikit kontras */
+  }
+
+  .notif-title {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin: 0;
+  }
+
+  .notif-read-all-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-family: var(--font-sans);
+    transition: opacity 0.15s;
+  }
+  .notif-read-all-btn:hover { 
+    opacity: 0.8;
+    text-decoration: underline; 
+  }
+
+  /* ── Daftar Notifikasi (Scroll Area) ── */
+  .notif-list {
+    max-height: 24rem; /* Batas tinggi scroll area */
+    overflow-y: auto;
+  }
+
+  /* ── State Loading ── */
+  .notif-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: 2.5rem;
+    color: var(--text-3);
+    font-size: 13px;
+  }
+
+  .notif-spinner {
+    width: 1.125rem;
+    height: 1.125rem;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: var(--r-full);
+    animation: spin 0.7s linear infinite;
+  }
+
+  /* ── Item Notifikasi Berbaris ── */
+  .notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-soft);
+    text-decoration: none;
+    transition: background-color 0.1s var(--ease-smooth);
+    background: var(--bg-1);
+  }
+  .notif-item:hover { 
+    background-color: var(--bg-2); 
+  }
+  .notif-item:last-child { 
+    border-bottom: none; 
+  }
+
+  /* Indikator Belum Dibaca (Garis Samping / Titik) */
+  .notif-item-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: var(--r-full);
+    background: var(--accent);
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .notif-item-msg {
+    font-size: 13px; /* Ukuran teks ideal untuk kenyamanan mata */
+    font-weight: 500;
+    color: var(--text-1);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .notif-item-time {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 4px;
+    display: block;
+  }
+
+  /* Varian opsional: Background khusus item yang belum dibaca */
+  .notif-item--unread {
+    background: var(--info-dim);
+  }
+  .notif-item--unread:hover {
+    background: var(--info-soft);
+  }
+
+  /* ── Empty State (Jika tidak ada notifikasi) ── */
+  .notif-empty {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    background: var(--bg-1);
+  }
+
+  .notif-empty-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: var(--r-full);
+    background: var(--bg-2);
+    border: 1px dashed var(--border-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    color: var(--text-3);
+    font-size: 1.5rem;
+  }
+
+  .notif-empty-title {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-1);
+    margin: 0;
+  }
+
+  .notif-empty-sub {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+}

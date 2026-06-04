@@ -79,6 +79,19 @@ class User extends Authenticatable
     }
 
     // ==========================================
+    // HELPER ROLE & PERMISSION
+    // ==========================================
+
+    public function hasRole($role)
+    {
+        return $this->role->name === $role;
+    }
+
+    public function hasAnyRole(array $roles)
+    {
+        return in_array($this->role->name, $roles);
+    }
+    // ==========================================
     // LOGIKA BISNIS (FAT MODEL)
     // ==========================================
 

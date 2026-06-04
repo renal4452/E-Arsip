@@ -1,0 +1,541 @@
+/**
+ * layout.css — Struktur Shell Aplikasi (Light Mode Optimized)
+ * ─────────────────────────────────────────────────────────
+ * App body, main area, content wrapper, sidebar & header.
+ *
+ * Prinsip:
+ * • Sidebar fixed di mobile, static di ≥1024px
+ * • Header sticky dengan blur backdrop
+ * • Content area full-height overflow scroll
+ * • Nav item dengan indikator garis kiri yang presisi
+ * ─────────────────────────────────────────────────────────
+ * Bergantung pada: tokens.css
+ */
+
+@layer components {
+
+  /* ════════════════════════════════════════
+     APP SHELL
+  ════════════════════════════════════════ */
+
+  .app-body {
+    display: flex;
+    height: 100dvh;
+    overflow: hidden;
+    background: var(--bg-base);
+  }
+
+  .app-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .app-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: var(--bg-base);
+  }
+
+  .content-wrapper {
+    max-width: var(--content-max-w);
+    margin: 0 auto;
+    padding: var(--space-5) var(--space-6) var(--space-16);
+  }
+
+  /* Backdrop blur saat sidebar terbuka di mobile */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.3); /* Aksesibilitas: Diturunkan dari 0.7 agar tidak terlalu pekat di Light Mode */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+
+  /* ════════════════════════════════════════
+     SIDEBAR
+  ════════════════════════════════════════ */
+
+  .app-sidebar {
+    position: fixed;
+    inset-y: 0;
+    left: 0;
+    z-index: 30;
+    width: var(--sidebar-w);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-1);
+    border-right: 1px solid var(--border);
+    transform: translateX(-100%);
+    transition: transform 0.3s var(--ease-out);
+    will-change: transform;
+    box-shadow: var(--shadow-lg); /* Tambahan shadow untuk mobile depth */
+  }
+
+  .app-sidebar.open          { transform: translateX(0); }
+
+  @media (min-width: 1024px) {
+    .app-sidebar {
+      position: static;
+      transform: none !important;
+      box-shadow: none; /* Hilangkan shadow saat diletakkan sejajar (static) */
+    }
+  }
+
+  /* ── Sidebar: Branding ── */
+  .sidebar-header {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-5); /* Disamakan dengan header utama */
+    border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+  }
+
+  /* Logomark persegi dengan simbol */
+  .sidebar-logomark {
+    width: 32px; /* Naik dari 30px */
+    height: 32px;
+    border-radius: var(--r-md);
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+    color: #ffffff; /* Lebih kontras di atas accent */
+    font-weight: 700;
+    font-family: var(--font-sans);
+  }
+
+  .sidebar-brand-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -0.02em;
+  }
+
+  .sidebar-brand-tag {
+    font-family: var(--font-mono);
+    font-size: 10px; /* Naik dari 9px */
+    font-weight: 600;
+    color: var(--text-3);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: 2px 6px;
+    border-radius: var(--r-sm);
+    margin-left: 4px;
+    letter-spacing: 0;
+  }
+
+  /* Tombol tutup sidebar — hanya tampil di mobile */
+  .sidebar-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text-2);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-smooth);
+  }
+  .sidebar-close-btn:hover {
+    color: var(--text-1);
+    background: var(--bg-2);
+    border-color: var(--border-strong);
+  }
+
+  @media (min-width: 1024px) {
+    .sidebar-close-btn { display: none; }
+  }
+
+  /* ── Sidebar: Navigasi ── */
+  .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--space-4) var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    scrollbar-width: thin; /* Biarkan thin agar lebih intuitif */
+    scrollbar-color: var(--border) transparent;
+  }
+
+  /* Label seksi nav */
+  .nav-section-label {
+    font-family: var(--font-mono);
+    font-size: 11px; /* Naik dari 9px */
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    padding: 0 var(--space-3);
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-2);
+    display: block;
+  }
+  .nav-section-label:first-child { margin-top: 0; }
+
+  /* Item navigasi */
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 8px var(--space-3);
+    border-radius: var(--r-md);
+    font-size: 14px; /* Optimal untuk readability navigasi utama */
+    font-weight: 500;
+    color: var(--text-2);
+    text-decoration: none;
+    transition: all 0.15s var(--ease-smooth);
+    position: relative;
+    border: 1px solid transparent;
+    background: transparent;
+    width: 100%;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    letter-spacing: -0.01em;
+  }
+  .sidebar-link:hover {
+    color: var(--text-1);
+    background: var(--bg-2);
+  }
+  .sidebar-link.active {
+    color: var(--accent);
+    background: var(--accent-dim);
+    border-color: var(--accent-soft);
+    font-weight: 600;
+  }
+
+  /* Indikator garis kiri — presisi & tajam */
+  .sidebar-link.active::before {
+    content: '';
+    position: absolute;
+    left: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 18px;
+    width: 3px;
+    background: var(--accent);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  }
+
+  .sidebar-link i {
+    font-size: 18px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* Badge angka di nav item */
+  .nav-badge {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px; /* Naik dari 9px */
+    font-weight: 700;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: var(--r-full);
+    padding: 2px 8px;
+    letter-spacing: 0;
+  }
+
+  .nav-badge.pulse {
+    animation: pulse-badge 2s ease-in-out infinite;
+  }
+
+  /* ── Sidebar: Footer / Profil ── */
+  .sidebar-footer {
+    padding: var(--space-3) var(--space-3) var(--space-5);
+    border-top: 1px solid var(--border-soft);
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    background: var(--bg-1);
+  }
+
+  .sidebar-profile-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--r-lg);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-smooth);
+  }
+  .sidebar-profile-card:hover {
+    background: var(--bg-3);
+    border-color: var(--border-strong);
+  }
+
+  /* Avatar inisial */
+  .sidebar-avatar {
+    width: 36px; /* Diperbesar proporsional */
+    height: 36px;
+    border-radius: var(--r-full);
+    background: var(--accent-dim);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+    letter-spacing: 0;
+  }
+
+  .sidebar-profile-info  { flex: 1; min-width: 0; }
+
+  .sidebar-profile-name {
+    font-size: 13px; /* Naik dari 12px */
+    font-weight: 700;
+    color: var(--text-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    letter-spacing: -0.01em;
+  }
+
+  .sidebar-profile-role {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 2px;
+    display: block;
+    font-family: var(--font-mono);
+    letter-spacing: 0;
+  }
+
+  .sidebar-profile-chevron {
+    color: var(--text-3);
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+  }
+  .sidebar-profile-card:hover .sidebar-profile-chevron {
+    transform: translateX(3px);
+    color: var(--accent);
+  }
+
+  /* Tombol logout */
+  .sidebar-logout-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: 8px;
+    background: transparent;
+    border: 1px solid var(--error-soft); /* Tokenisasi border */
+    border-radius: var(--r-md);
+    color: var(--error);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-smooth);
+    font-family: var(--font-sans);
+    letter-spacing: -0.01em;
+  }
+  .sidebar-logout-btn:hover {
+    background: var(--error-dim);
+    border-color: var(--error);
+  }
+  .sidebar-logout-btn i { font-size: 16px; }
+
+
+  /* ════════════════════════════════════════
+     HEADER
+  ════════════════════════════════════════ */
+
+  .app-header {
+    height: var(--header-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-6);
+    background: rgba(255, 255, 255, 0.85); /* Semi transparan untuk efek lengket */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-soft);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  .header-left,
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* Hamburger — hanya di mobile */
+  .hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px; /* Touch target lebih ramah */
+    height: 36px;
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text-2);
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s var(--ease-smooth);
+  }
+  .hamburger-btn:hover {
+    color: var(--accent);
+    border-color: var(--accent-soft);
+    background: var(--accent-dim);
+  }
+
+  @media (min-width: 1024px) {
+    .hamburger-btn { display: none; }
+  }
+
+  /* Judul halaman di header */
+  .header-page-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -0.02em;
+  }
+
+  /* Breadcrumb kompak */
+  .header-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px; /* Naik dari 11px */
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    letter-spacing: 0;
+  }
+  .header-breadcrumb a {
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .header-breadcrumb a:hover    { color: var(--accent); }
+  .header-breadcrumb-sep        { opacity: 0.5; }
+  .header-breadcrumb-current    { color: var(--text-1); font-weight: 600; }
+
+  /* Chip tanggal — hanya di ≥1024px */
+  .header-date-chip {
+    display: none;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--text-2);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    padding: 6px 14px;
+    border-radius: var(--r-full);
+    letter-spacing: 0;
+  }
+  @media (min-width: 1024px) {
+    .header-date-chip { display: flex; }
+  }
+  .header-date-chip i {
+    color: var(--accent);
+    font-size: 14px;
+  }
+
+
+  /* ════════════════════════════════════════
+     PAGE HEADER — di dalam content area
+  ════════════════════════════════════════ */
+
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8); /* Ruang napas diperlebar */
+    flex-wrap: wrap;
+  }
+
+  .page-header-meta { flex: 1; min-width: 0; }
+
+  /* Eyebrow / kode konteks */
+  .page-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px; /* Naik dari 10px */
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+  }
+
+  .page-title {
+    font-size: 26px; /* Naik dari 22px agar hirarki H1 lebih terasa */
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+  }
+
+  .page-subtitle {
+    font-size: 14px; /* Naik dari 13px */
+    color: var(--text-2);
+    margin-top: var(--space-2);
+    line-height: 1.6;
+  }
+
+  /* Breadcrumb standalone di atas page title */
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px; /* Naik dari 11px */
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    margin-bottom: var(--space-3);
+  }
+  .breadcrumb a {
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .breadcrumb a:hover     { color: var(--accent); }
+  .breadcrumb-sep         { opacity: 0.5; font-size: 11px; }
+  .breadcrumb-current     { color: var(--text-1); font-weight: 600; }
+
+  .page-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-shrink: 0;
+    padding-top: var(--space-1);
+  }
+}

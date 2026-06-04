@@ -1,0 +1,35 @@
+/**
+ * scrollbar.css — Kustomisasi Scrollbar
+ * ─────────────────────────────────────────────────────────
+ * Elegan, tersinkronisasi dengan token, dan mendukung 
+ * peramban non-Webkit (Firefox).
+ * ─────────────────────────────────────────────────────────
+ */
+
+@layer components {
+  
+  .custom-scrollbar {
+    /* ── Dukungan standar modern (Firefox) ── */
+    scrollbar-width: thin; 
+    scrollbar-color: var(--border-strong) transparent;
+  }
+
+  /* ── Dukungan WebKit (Chrome, Safari, Edge) ── */
+  .custom-scrollbar::-webkit-scrollbar { 
+    width: 6px; 
+    height: 6px; /* Tambahan: berjaga-jaga jika ada scroll horizontal */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track { 
+    background: transparent; 
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--border-strong); /* Menggantikan #cbd5e1 */
+    border-radius: var(--r-full); /* Menggantikan 20px */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover { 
+    background-color: var(--text-3); /* Menggantikan #94a3b8 agar lebih gelap saat interaksi */
+  }
+}

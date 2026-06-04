@@ -9,7 +9,7 @@
 
 <div class="w-full" x-data="{ 
     activeTab: 'versions',
-    revisiModalOpen: false,
+    revisiModalOpen: {{ $errors->has('notes') ? 'true' : 'false' }},
     forceUpdateModalOpen: false,
     tteModalOpen: false
 }">
@@ -205,10 +205,22 @@
                 <h5 class="font-extrabold text-slate-800 flex items-center gap-2"><i class="bi bi-pencil-square text-rose-500 text-xl"></i> Beri Catatan Revisi</h5>
                 <button @click="revisiModalOpen = false" class="text-slate-400 hover:text-slate-600"><i class="bi bi-x-lg"></i></button>
             </div>
+            
             <form action="{{ route('documents.revisi', $document->id) }}" method="POST">
                 @csrf
+                
+                <input type="hidden" name="status" value="Revisi">
+                
                 <div class="p-6 bg-slate-50">
-                    <textarea name="note" class="w-full bg-white border border-slate-200 text-slate-700 text-sm rounded-xl p-4 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 focus:outline-none transition-colors" rows="5" placeholder="Tuliskan poin-poin yang perlu diperbaiki oleh pengunggah..." required></textarea>
+                    
+                    <textarea name="notes" class="w-full bg-white border @error('notes') border-rose-500 ring-2 ring-rose-200 @else border-slate-200 @enderror text-slate-700 text-sm rounded-xl p-4 focus:ring-2 focus:ring-rose-500 focus:border-rose-500 focus:outline-none transition-colors" rows="5" placeholder="Tuliskan poin-poin yang perlu diperbaiki oleh pengunggah..." required>{{ old('notes') }}</textarea>
+                    
+                    @error('notes')
+                        <p class="mt-2 text-xs font-bold text-rose-500 flex items-center gap-1">
+                            <i class="bi bi-exclamation-triangle-fill"></i> {{ $message }}
+                        </p>
+                    @enderror
+
                 </div>
                 <div class="px-6 py-4 bg-white border-t border-slate-100 flex justify-end gap-3">
                     <button type="button" @click="revisiModalOpen = false" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl hover:bg-slate-50 transition-colors text-sm">Batal</button>

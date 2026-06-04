@@ -1,50 +1,76 @@
-<div class="card shadow-sm border-0 rounded-4 overflow-hidden">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead class="bg-light">
-                <tr>
-                    <th class="ps-4 py-3 text-muted small fw-bold text-uppercase">Nama Kategori Publik</th>
-                    <th class="py-3 text-muted small fw-bold text-uppercase text-center">Status</th>
-                    <th class="py-3 text-muted small fw-bold text-uppercase text-center">Jumlah Dokumen</th>
-                    <th class="text-end pe-4 py-3 text-muted small fw-bold text-uppercase">Aksi</th>
+<div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 border-b border-slate-200 text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                    <th class="px-6 py-4">Nama Kategori Publik</th>
+                    <th class="px-6 py-4 text-center w-36 whitespace-nowrap">Status</th>
+                    <th class="px-6 py-4 text-center w-44 whitespace-nowrap">Jumlah Dokumen</th>
+                    <th class="px-6 py-4 text-center w-40 whitespace-nowrap">Aksi</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-slate-200">
                 @forelse($sharedTypes as $type)
-                <tr>
-                    <td class="ps-4">
-                        <span class="fw-bold text-dark">{{ $type->name }}</span>
-                        <div class="text-muted small">{{ $type->description ?? '-' }}</div>
-                    </td>
-                    <td class="text-center">
-                        <span class="badge {{ $type->is_active ? 'bg-success-subtle text-success border border-success-subtle' : 'bg-danger-subtle text-danger border border-danger-subtle' }} px-3 py-2 rounded-pill small">
-                            {{ $type->is_active ? 'AKTIF' : 'NONAKTIF' }}
-                        </span>
-                    </td>
-                    <td class="text-center small fw-medium">{{ $type->shared_documents_count }} Berkas</td>
-                    <td class="text-end pe-4">
-                        <div class="d-flex gap-2 justify-content-end">
-                            <form action="{{ route('categories.toggle', $type->id) }}" method="POST">
-                                @csrf @method('PATCH')
-                                <input type="hidden" name="module" value="shared">
-                                <button type="submit" class="btn btn-sm {{ $type->is_active ? 'btn-outline-warning' : 'btn-outline-success' }} rounded-3 px-3">
-                                    {{ $type->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                </button>
-                            </form>
-                            <form action="{{ route('categories.destroy', $type->id) }}" method="POST" onsubmit="return confirm('Hapus permanen kategori ini?')">
-                                @csrf @method('DELETE')
-                                <input type="hidden" name="module" value="shared">
-                                <button type="submit" class="btn btn-sm btn-light border text-danger rounded-3">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
+                    <tr class="hover:bg-slate-50/80 transition-colors duration-200 group">
+                        
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-800 text-sm">{{ $type->name }}</div>
+                            <div class="text-xs text-slate-500 mt-0.5 line-clamp-1" title="{{ $type->description }}">{{ $type->description ?? '-' }}</div>
+                        </td>
+
+                        <td class="px-6 py-4 text-center whitespace-nowrap">
+                            @if($type->is_active)
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-bold tracking-wide">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> AKTIF
+                                </span>
+                            @else
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold tracking-wide">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> NONAKTIF
+                                </span>
+                            @endif
+                        </td>
+
+                        <td class="px-6 py-4 text-center whitespace-nowrap text-sm font-semibold text-slate-600">
+                            {{ $type->shared_documents_count ?? 0 }} Berkas
+                        </td>
+
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center justify-center gap-2">
+                                <form action="{{ route('categories.toggle', $type->id) }}" method="POST" class="m-0">
+                                    @csrf 
+                                    @method('PATCH')
+                                    <input type="hidden" name="module" value="shared">
+                                    @if($type->is_active)
+                                        <button type="submit" class="px-3 py-1.5 text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-600 hover:text-white hover:border-amber-600 transition-all shadow-sm">
+                                            Nonaktifkan
+                                        </button>
+                                    @else
+                                        <button type="submit" class="px-3 py-1.5 text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all shadow-sm">
+                                            Aktifkan
+                                        </button>
+                                    @endif
+                                </form>
+
+                                <form action="{{ route('categories.destroy', $type->id) }}" method="POST" class="m-0" onsubmit="return confirm('Hapus permanen kategori ini?')">
+                                    @csrf 
+                                    @method('DELETE')
+                                    <input type="hidden" name="module" value="shared">
+                                    <button type="submit" class="w-8 h-8 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-rose-600 hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all shadow-sm" title="Hapus Kategori">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
                 @empty
-                <tr>
-                    <td colspan="4" class="text-center py-4 text-muted small">Belum ada kategori ruang berbagi.</td>
-                </tr>
+                    <tr>
+                        <td colspan="4" class="px-6 py-12 text-center text-sm font-medium text-slate-400 bg-slate-50/30">
+                            <div class="flex flex-col items-center justify-center gap-2">
+                                <i class="bi bi-folder-x text-3xl text-slate-300"></i>
+                                <span class="font-semibold text-slate-500">Belum ada kategori ruang berbagi.</span>
+                            </div>
+                        </td>
+                    </tr>
                 @endforelse
             </tbody>
         </table>

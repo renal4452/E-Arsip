@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Document; // Wajib ada
+use App\Models\Document;
 use Illuminate\Http\Request;
-use Illuminate\View\View; // ✅ TAMBAHKAN INI (Opsional tapi best practice)
-
-// ❌ HAPUS: use Inertia\Inertia;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
@@ -20,12 +18,13 @@ class DashboardController extends Controller
             'approved' => Document::where('status', 'approved')->count(),
         ];
 
-        // 2. Ambil 5 Dokumen Terbaru (LHP) 
-        // ✅ Eager Loading ditambahkan biar ngerender di Blade nanti ngebut
-        $recentDocs = Document::with(['division', 'docType'])->latest()->take(5)->get();
+        // 2. Ambil 5 Dokumen Terbaru dengan relasi
+        $recentDocs = Document::with(['division', 'docType'])
+            ->latest()
+            ->take(5)
+            ->get();
 
-        // 3. Render ke Blade (resources/views/dashboard.blade.php)
-        // ✅ UBAH: Pakai view() dan compact()
+        // 3. Return ke Blade
         return view('dashboard.index', compact('stats', 'recentDocs'));
     }
 }

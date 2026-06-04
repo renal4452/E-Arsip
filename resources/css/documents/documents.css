@@ -1,0 +1,336 @@
+/**
+ * documents.css
+ * ─────────────────────────────────────────────────────────
+ * Styling khusus untuk semua halaman dokumen:
+ * index, create, show, revisi_form, revisi
+ *
+ * Bergantung pada: tokens.css, base.css, buttons.css,
+ * forms.css, content.css, data-display.css
+ * ─────────────────────────────────────────────────────────
+ */
+
+@layer components {
+
+  /* ════════════════════════════════════════
+     STAT GRID (index)
+  ════════════════════════════════════════ */
+
+  .doc-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4); /* Diperlebar sedikit agar lebih lega */
+    margin-bottom: var(--space-5);
+  }
+
+  @media (max-width: 640px) {
+    .doc-stat-grid { grid-template-columns: 1fr; }
+  }
+
+
+  /* ════════════════════════════════════════
+     TOOLBAR (index)
+  ════════════════════════════════════════ */
+
+  .doc-toolbar {
+    background: var(--bg-1);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-xl);
+    margin-bottom: var(--space-4);
+    box-shadow: var(--shadow-sm); /* Tambahan shadow halus */
+  }
+
+  .doc-toolbar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+  }
+
+  /* ── Pill status ── */
+  .doc-filter-pills {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .doc-filter-label {
+    font-family: var(--font-mono);
+    font-size: 10px; /* Aksesibilitas: Naik dari 9px ke 10px */
+    font-weight: 600;
+    color: var(--text-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: var(--space-1);
+  }
+
+  .doc-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--r-full);
+    font-size: 12px; /* Naik dari 11px */
+    font-weight: 500;
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    cursor: pointer;
+    background: var(--bg-2);
+    transition: all 0.2s var(--ease-smooth);
+    letter-spacing: -0.01em;
+  }
+  .doc-pill:hover { 
+    color: var(--text-1); 
+    border-color: var(--border-strong); 
+    background: var(--bg-3);
+  }
+
+  .doc-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--r-full);
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* Varian aktif (Hardcode RGBA dihapus, diganti token soft/dim) */
+  .doc-pill--active   { background: var(--bg-4); border-color: var(--border-strong); color: var(--text-1); font-weight: 600; }
+  .doc-pill--pending  { background: var(--warning-dim); border-color: var(--warning-soft); color: var(--warning); }
+  .doc-pill--revisi   { background: var(--error-dim);   border-color: var(--error-soft);   color: var(--error); }
+  .doc-pill--approved { background: var(--success-dim); border-color: var(--success-soft); color: var(--success); }
+  .doc-pill--filter   { border-color: var(--accent-soft); color: var(--accent); background: transparent; }
+  .doc-pill--filter-active { background: var(--accent-dim); border-color: var(--accent-soft); color: var(--accent); }
+
+  /* ── Search ── */
+  .doc-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .doc-search-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .doc-search-icon {
+    position: absolute;
+    left: var(--space-3);
+    color: var(--text-3);
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  .doc-search-input {
+    width: 220px;
+    height: 34px;
+    padding: 0 var(--space-3) 0 calc(var(--space-3) + 20px);
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text-1);
+    font-size: 13px; /* Naik dari 12px */
+    font-family: var(--font-sans);
+    transition: all 0.2s var(--ease-smooth);
+  }
+  .doc-search-input::placeholder { color: var(--text-3); }
+  .doc-search-input:hover { border-color: var(--border-strong); }
+  .doc-search-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--bg-1);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+
+  /* ── View toggle ── */
+  .doc-view-toggle {
+    display: flex;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    padding: 2px;
+    gap: 1px;
+  }
+
+  .doc-vt-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--text-3);
+    text-decoration: none;
+    transition: all 0.15s var(--ease-smooth);
+  }
+  .doc-vt-btn:hover { color: var(--text-1); background: var(--bg-3); }
+  .doc-vt-btn--active { background: var(--bg-1); color: var(--accent); box-shadow: var(--shadow-sm); }
+
+  /* ── Filter advanced divider & form ── */
+  .doc-filter-divider {
+    height: 1px;
+    background: var(--border-soft);
+    margin: 0 var(--space-4);
+  }
+
+  .doc-advanced-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-4);
+    align-items: end;
+    padding: var(--space-4);
+  }
+
+
+  /* ════════════════════════════════════════
+     FOLDER VIEW (index)
+  ════════════════════════════════════════ */
+
+  .doc-folder-card {
+    background: var(--bg-1); /* Ubah ke bg-1 agar kontras dengan background utama */
+    border: 1px solid var(--border);
+    border-radius: var(--r-xl);
+    padding: var(--space-4);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-out);
+    text-align: left;
+    width: 100%;
+  }
+  .doc-folder-card:hover {
+    border-color: var(--accent-soft);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+
+  /* ════════════════════════════════════════
+     TABEL DOKUMEN (index)
+  ════════════════════════════════════════ */
+
+  /* Penyesuaian ukuran teks agar lebih nyaman dibaca */
+  .doc-number { font-size: 13px; }
+  .doc-title-text { font-size: 13px; max-width: 280px; }
+  .doc-type-text { font-size: 11px; }
+  .doc-division-name { font-size: 13px; }
+  .doc-date-text { font-size: 11px; }
+  .doc-version-chip { font-size: 10px; padding: 2px 8px; }
+
+
+  /* ════════════════════════════════════════
+     MODAL (digunakan di index & show)
+  ════════════════════════════════════════ */
+
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.4); /* Aksesibilitas: Diturunkan dari 0.72 agar tidak terlihat seperti gerhana */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+  }
+
+  .modal-box {
+    background: var(--bg-1); /* Box modal sebaiknya putih murni di Light Mode */
+    border: 1px solid var(--border);
+    border-radius: var(--r-2xl);
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+  }
+
+  /* ════════════════════════════════════════
+     FILE INPUT & DROPZONE
+  ════════════════════════════════════════ */
+
+  .doc-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-8) var(--space-6);
+    background: var(--bg-2);
+    border: 2px dashed var(--border); /* Dipertegas menjadi 2px */
+    border-radius: var(--r-xl);
+    cursor: pointer;
+    transition: all 0.2s var(--ease-smooth);
+    text-align: center;
+  }
+  .doc-dropzone:hover,
+  .doc-dropzone--over {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+
+  /* ════════════════════════════════════════
+     CREATE / SHOW LAYOUT & SIDEBAR
+  ════════════════════════════════════════ */
+
+  .doc-create-aside, .doc-show-aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    position: sticky;
+    top: calc(var(--header-h) + var(--space-6)); /* Jarak sticky diperbaiki */
+  }
+
+  .doc-approval-info, .doc-flow {
+    background: var(--bg-1);
+    border-radius: var(--r-xl);
+    padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Penyesuaian Flow */
+  .doc-flow-label {
+    font-size: 10px; /* Naik dari 9px */
+    font-weight: 500;
+  }
+  .doc-flow-icon {
+    width: 32px; /* Diperbesar sedikit agar icon tidak sesak */
+    height: 32px;
+    font-size: 14px;
+  }
+
+
+  /* ════════════════════════════════════════
+     REVISI FORM & REVISI PAGE
+  ════════════════════════════════════════ */
+
+  .doc-revision-item {
+    background: var(--bg-1);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--r-xl);
+    padding: var(--space-4);
+  }
+
+  .doc-revision-item--latest {
+    border-color: var(--error-soft);
+    background: var(--error-dim);
+  }
+
+  .doc-revision-content {
+    font-size: 14px; /* Optimal untuk blok teks panjang */
+    color: var(--text-1);
+    line-height: 1.6;
+    padding: var(--space-4);
+    background: var(--bg-2);
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border);
+    margin-top: var(--space-2);
+  }
+}

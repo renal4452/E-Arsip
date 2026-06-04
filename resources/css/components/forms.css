@@ -1,0 +1,289 @@
+/**
+ * forms.css — Komponen Formulir (Optimasi Light Mode & Aksesibilitas)
+ * ─────────────────────────────────────────────────────────
+ * Prinsip desain:
+ * • Input berlatar putih bersih (var(--bg-1)) agar kontras.
+ * • Fokus menggunakan warna aksen utama (var(--accent)).
+ * • Ukuran teks 14px untuk memenuhi standar aksesibilitas (A11y).
+ * ─────────────────────────────────────────────────────────
+ * Bergantung pada: tokens.css
+ */
+
+@layer components {
+
+  /* ── Field group (label + input + error) ── */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    /* Menggunakan unit rem/px karena token --space belum didefinisikan di tokens.css kita */
+    gap: 0.25rem; 
+    margin-bottom: 1rem;
+  }
+  .form-group:last-child { margin-bottom: 0; }
+
+  /* ── Row group (input sejajar) ── */
+  .form-row {
+    display: grid;
+    gap: 1rem;
+  }
+  .form-row-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form-row-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+  @media (max-width: 640px) {
+    .form-row-2,
+    .form-row-3 { grid-template-columns: 1fr; }
+  }
+
+
+  /* ── Label ── */
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.875rem; /* 14px (Ditingkatkan untuk A11y) */
+    font-weight: 600;
+    color: var(--text-1); 
+    letter-spacing: -0.01em;
+  }
+
+  /* Asterisk wajib isi */
+  .form-label.required::after {
+    content: '*';
+    color: var(--error);
+    font-size: 0.75rem; /* 12px */
+    margin-left: 2px;
+  }
+
+  /* Tooltip bantuan di samping label */
+  .form-label-hint {
+    color: var(--text-3);
+    font-size: 0.875rem; /* 14px */
+    cursor: help;
+    transition: color 0.15s;
+  }
+  .form-label-hint:hover { color: var(--accent-light); }
+
+
+  /* ── Input Dasar (Clean White style) ── */
+  .form-input {
+    width: 100%;
+    height: 38px; /* Ditebalkan untuk area sentuh yang lebih nyaman */
+    padding: 0 0.75rem; /* 12px */
+    background: var(--bg-1); /* Wajib putih bersih di Light Mode */
+    color: var(--text-1);
+    border: 1px solid var(--border-strong); 
+    border-radius: var(--r-md);
+    font-family: inherit; /* Menggunakan bawaan dari base.css */
+    font-size: 0.875rem; /* 14px */
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .form-input::placeholder { color: var(--text-3); }
+  .form-input:hover        { border-color: var(--accent-light); }
+  .form-input:focus {
+    outline: none;
+    background: var(--bg-1);
+    border-color: var(--accent);
+    /* Menggunakan token --accent-dim untuk ring fokus agar sinkron */
+    box-shadow: 0 0 0 3px var(--accent-dim); 
+  }
+  .form-input:disabled {
+    background: var(--bg-2);
+    color: var(--text-3);
+    border-color: var(--border);
+    cursor: not-allowed;
+  }
+
+  /* Input dengan pembungkus ikon dekoratif */
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-wrap .form-input {
+    padding-left: calc(0.75rem + 20px + 0.25rem);
+  }
+  .input-wrap .input-icon-left {
+    position: absolute;
+    left: 0.75rem;
+    color: var(--text-3);
+    font-size: 16px;
+    pointer-events: none;
+    transition: color 0.15s;
+  }
+  .input-wrap:focus-within .input-icon-left { color: var(--accent); }
+  
+  .input-wrap .input-icon-right {
+    position: absolute;
+    right: 0.75rem;
+    color: var(--text-3);
+    font-size: 16px;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .input-wrap .input-icon-right:hover { color: var(--text-1); }
+  .input-wrap.has-right .form-input {
+    padding-right: calc(0.75rem + 20px + 0.25rem);
+  }
+
+
+  /* ── Error State (Klarifikasi Validasi) ── */
+  .form-input-error {
+    border-color: var(--error-soft) !important;
+    background: var(--error-dim) !important;
+    color: var(--error) !important; 
+  }
+  .form-input-error:focus {
+    border-color: var(--error) !important;
+    box-shadow: 0 0 0 3px var(--error-dim) !important;
+  }
+
+  /* Teks panduan pesan error di bawah kolom */
+  .form-error {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem; /* 12px */
+    font-weight: 500;
+    color: var(--error);
+    margin-top: 2px;
+  }
+  .form-error i { font-size: 14px; }
+
+
+  /* ── Hint (Teks Petunjuk) ── */
+  .form-hint {
+    font-size: 0.75rem; /* 12px */
+    color: var(--text-2);
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+
+  /* ── Select (Kalibrasi Chevron Warna Netral & Aksen) ── */
+  select.form-input {
+    /* Menggunakan ikon abu-abu gelap (Slate 500 / #64748b) untuk default state */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    padding-right: calc(0.75rem + 20px);
+    cursor: pointer;
+  }
+  select.form-input:focus {
+    /* Mengubah chevron menjadi warna Aksen (Amber 600 / #d97706) saat fokus aktif */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23d97706' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  }
+
+
+  /* ── Textarea ── */
+  textarea.form-input {
+    height: auto;
+    min-height: 96px; 
+    padding: 0.5rem 0.75rem;
+    resize: vertical;
+    line-height: 1.6;
+  }
+
+
+  /* ── Checkbox & Radio (Native Modern) ── */
+  .form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .form-check-input {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: var(--accent); 
+    cursor: pointer;
+  }
+
+  .form-check-label {
+    font-size: 0.875rem; /* 14px */
+    color: var(--text-1);
+    cursor: pointer;
+    user-select: none;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+  .form-check-sublabel {
+    font-size: 0.75rem; /* 12px */
+    color: var(--text-2);
+    margin-top: 1px;
+    display: block;
+  }
+
+
+  /* ── Toggle Switch ── */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .toggle-track {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    background: var(--bg-3); /* Background abu-abu netral */
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-full);
+    transition: all 0.2s var(--ease-smooth);
+    flex-shrink: 0;
+  }
+  .toggle-track.on {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .toggle-thumb {
+    position: absolute;
+    top: 1px; /* Disesuaikan agar presisi dengan border */
+    left: 1px;
+    width: 18px;
+    height: 18px;
+    background: #ffffff; 
+    border-radius: var(--r-full);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.2s var(--ease-out);
+  }
+  .toggle-track.on .toggle-thumb {
+    transform: translateX(16px);
+  }
+
+  .toggle-label {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: -0.01em;
+  }
+
+
+  /* ── Field Group Berbingkai (Fieldset) ── */
+  .form-fieldset {
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-lg);
+    padding: 1rem;
+    background: var(--bg-1);
+  }
+
+  .form-legend {
+    font-size: 0.6875rem; /* 11px */
+    font-weight: 600;
+    color: var(--text-2);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0 0.5rem;
+    margin-left: -0.5rem;
+    font-family: inherit;
+  }
+}

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Document;
@@ -8,6 +9,8 @@ use App\Services\WorkflowService;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 // Form Requests
 use App\Http\Requests\StoreDocumentRequest;
@@ -15,10 +18,6 @@ use App\Http\Requests\UpdateRevisionRequest;
 use App\Http\Requests\ReviewDocumentRequest;
 use App\Http\Requests\UploadFinalRequest;
 use App\Http\Requests\ForceUpdateRequest;
-
-// ❌ HAPUS: use App\Traits\ApiResponse;
-// ❌ HAPUS: use App\Http\Resources\DocumentResource;
-// ❌ HAPUS: use Inertia\Inertia;
 
 class DocumentController extends Controller
 {
@@ -31,13 +30,15 @@ class DocumentController extends Controller
         $this->workflowService = $workflowService;
     }
 
+    /**
+     * Menampilkan daftar dokumen dengan filter.
+     */
     public function index(Request $request): View
     {
-        // Tangkap semua input filter dari Blade
         $filters = $request->only(['search', 'status', 'year', 'type', 'start_date', 'end_date']);
+        $viewMode = $request->get('view', 'folder');
 
-        // Ambil data dengan Eager Loading
-        $documents = Document::with(['docType', 'division', 'latestVersion'])
+        $query = Document::with(['docType', 'division', 'latestVersion'])
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('no_doc', 'like', "%{$search}%")
@@ -52,82 +53,104 @@ class DocumentController extends Controller
             })
             ->when($filters['year'] ?? null, function ($query, $year) {
                 $query->whereYear('created_at', $year);
-            })
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
+            });
 
-        // Ambil data kategori untuk dropdown filter
+        if ($viewMode === 'folder') {
+            $documents = $query->latest()->get();
+        } else {
+            $documents = $query->latest()->paginate(10)->withQueryString();
+        }
+
         $categories = DocType::all();
 
-        // Hitung statistik untuk Dashboard/Header Index
         $stats = [
             'pending' => Document::where('status', 'pending')->count(),
             'approved' => Document::where('status', 'approved')->count(),
         ];
 
-        // ✅ UBAH: Render ke Blade
-        return view('documents.index', compact('documents', 'categories', 'stats', 'filters'));
+        return view('documents.index', compact('documents', 'categories', 'stats', 'filters', 'viewMode'));
     }
 
+    /**
+     * Menampilkan detail dokumen, log aktivitas, dan riwayat versi.
+     */
     public function show(Document $document): View
     {
-        // 1. Ambil relasi yang dibutuhkan untuk halaman detail
         $document->load(['docType', 'division', 'auditor']);
-
-        // 2. Ambil riwayat versi dokumen (terbaru di atas)
         $versions = $document->versions()->with('uploader')->latest()->get();
-
-        // 3. Ambil log aktivitas terkait dokumen ini
         $logs = $document->activityLogs()->with('user')->latest()->get();
 
-        // ✅ UBAH: Render ke Blade
         return view('documents.show', compact('document', 'versions', 'logs'));
     }
 
+    /**
+     * Menampilkan form pembuatan draf dokumen baru.
+     */
     public function create(): View
     {
         $categories = DocType::all();
         return view('documents.create', compact('categories'));
     }
     
+    /**
+     * Menyimpan draf dokumen baru ke sistem.
+     */
     public function store(StoreDocumentRequest $request): RedirectResponse
     {
         $this->docService->createNewDocument($request->validated(), $request->user());
-
-        // ✅ HAPUS: Pengecekan JSON. Langsung redirect!
         return redirect()->route('documents.index')->with('success', 'Draf berhasil diunggah.');
     }
 
+    /**
+     * Menampilkan form revisi dokumen (Untuk mengatasi error GET /documents/{id}/revisi).
+     */
+    public function revisiForm(Document $document): View
+    {
+        Gate::authorize('review', $document);
+        $document->load(['docType', 'division']);
+
+        return view('documents.revisi', compact('document'));
+    }
+
+    /**
+     * Memproses penolakan dokumen dan menyimpan catatan revisi dari Auditor.
+     */
+    public function storeRevisi(ReviewDocumentRequest $request, Document $document): RedirectResponse
+    {
+        // Ubah $request->note menjadi $request->notes (pakai 's')
+        $this->workflowService->processRejection($document, $request->notes, $request->user());
+        
+        return redirect()->route('documents.show', $document->id)
+            ->with('success', 'Dokumen berhasil diubah statusnya menjadi Perlu Revisi.');
+    }
+    /**
+     * Mengunggah file berkas draf perbaikan baru oleh User/Uploader.
+     */
     public function updateRevision(UpdateRevisionRequest $request, Document $document): RedirectResponse
     {
         $this->docService->uploadNewVersion($document, $request->file('file'), $request->user(), 'pending', null);
-        
         return redirect()->route('documents.show', $document->id)->with('success', 'Revisi berhasil dikirim.');
     }
 
+    /**
+     * Menyetujui dokumen (ACC) oleh Auditor/Pihak Berwenang.
+     */
     public function approve(Request $request, Document $document): RedirectResponse
     {
-        $this->authorize('review', $document); 
+        Gate::authorize('review', $document); 
         $this->workflowService->processApproval($document, $request->user());
         
         return back()->with('success', 'Dokumen berhasil disetujui.');
     }
 
-    public function storeRevisi(ReviewDocumentRequest $request, Document $document): RedirectResponse
-    {
-        $this->authorize('review', $document);
-        $this->workflowService->processRejection($document, $request->note, $request->user());
-        
-        return redirect()->route('documents.show', $document->id)->with('success', 'Permintaan revisi dikirim.');
-    }
-
+    /**
+     * Mengunggah berkas final yang telah ditandatangani secara elektronik (TTE).
+     */
     public function uploadFinalDocument(UploadFinalRequest $request, Document $document): RedirectResponse
     {
-        $this->authorize('review', $document);
+        Gate::authorize('review', $document); 
 
         if (!$document->isApproved()) {
-            // ✅ HAPUS: Pengecekan JSON
             return back()->with('error', 'Dokumen belum di-ACC.');
         }
 
@@ -136,21 +159,53 @@ class DocumentController extends Controller
         return back()->with('success', 'Dokumen Final (TTE) berhasil diunggah.');
     }
 
+    /**
+     * Memperbarui file berkas secara mandiri/paksa (Force Update).
+     */
     public function forceUpdateFile(ForceUpdateRequest $request, Document $document): RedirectResponse
     {
-        $this->authorize('forceUpdate', $document);
+        Gate::authorize('forceUpdate', $document); 
 
         $this->docService->uploadNewVersion($document, $request->file('file'), $request->user(), 'pending', 'Diperbarui mandiri.');
 
         return back()->with('success', 'Berkas berhasil diperbarui.');
     }
 
+    /**
+     * Mengunduh berkas fisik berdasarkan ID versi dokumen.
+     */
+    public function download($versionId)
+    {
+        $document = Document::whereHas('versions', function($q) use ($versionId) {
+            $q->where('id', $versionId);
+        })->firstOrFail();
+
+        $version = $document->versions()->where('id', $versionId)->firstOrFail();
+        
+        // Deteksi dinamis nama kolom penyimpanan file yang Anda gunakan
+        $filePath = $version->file_path ?? $version->path ?? $version->file; 
+
+        if (!$filePath) {
+            return back()->with('error', 'Path berkas tidak ditemukan di database.');
+        }
+
+        if (Storage::disk('public')->exists($filePath)) {
+            return Storage::disk('public')->download($filePath);
+        } elseif (Storage::disk('local')->exists($filePath)) {
+            return Storage::disk('local')->download($filePath);
+        }
+
+        return back()->with('error', 'Berkas fisik tidak ditemukan di server.');
+    }
+
+    /**
+     * Menghapus dokumen dari sistem.
+     */
     public function destroy(Request $request, Document $document): RedirectResponse
     {
-        $this->authorize('delete', $document);
+        Gate::authorize('delete', $document); 
 
         if ($document->isLocked()) {
-            // ✅ HAPUS: Pengecekan JSON
             return back()->with('error', '⚠️ Dokumen Terkunci.');
         }
 

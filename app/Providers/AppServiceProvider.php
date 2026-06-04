@@ -7,7 +7,8 @@ use Illuminate\Support\ServiceProvider;
 use App\Models\Document;
 use App\Observers\DocumentObserver;
 use App\Models\User;                   
-use App\Observers\UserObserver;        
+use App\Observers\UserObserver;       
+use Illuminate\Support\Facades\View; 
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -32,5 +33,22 @@ class AppServiceProvider extends ServiceProvider
         // 2. NYALAKAN CCTV (Observer) UNTUK LOG AKTIVITAS
         Document::observe(DocumentObserver::class);
         User::observe(UserObserver::class); // <-- CCTV untuk perubahan password User!
+
+        View::composer('*', function ($view) {
+
+            if (auth()->check()) {
+
+                $unreadNotifications = auth()->user()
+                    ->unreadNotifications()
+                    ->latest()
+                    ->take(10)
+                    ->get();
+
+                $view->with([
+                    'unreadNotifications' => $unreadNotifications,
+                    'unreadNotificationsCount' => $unreadNotifications->count(),
+                ]);
+            }
+        });
     }
 }

@@ -1,0 +1,218 @@
+/**
+ * buttons.css — Sistem Tombol (Optimasi Light Mode & A11y)
+ * ─────────────────────────────────────────────────────────
+ * Varian:
+ * .btn-primary   — CTA utama, latar solid (Aksen Utama)
+ * .btn-secondary — Aksi netral, latar putih
+ * .btn-ghost     — Minimal, tanpa border
+ * .btn-danger    — Aksi destruktif (Soft Red)
+ * .btn-icon      — Persegi berisi ikon saja
+ * ─────────────────────────────────────────────────────────
+ * Bergantung pada: tokens.css
+ */
+
+@layer components {
+
+  /* ── Base bersama ── */
+  .btn-primary,
+  .btn-secondary,
+  .btn-ghost,
+  .btn-danger,
+  .btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: var(--r-md);
+    font-family: inherit; /* Mengambil dari base.css */
+    font-size: 0.875rem; /* 14px - Ramah baca (A11y) */
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.15s var(--ease-smooth);
+    text-decoration: none;
+    white-space: nowrap;
+    letter-spacing: -0.01em;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* State disabled (Aksesibilitas) */
+  .btn-primary:disabled,
+  .btn-secondary:disabled,
+  .btn-ghost:disabled,
+  .btn-danger:disabled,
+  .btn-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(100%);
+  }
+
+  /* Ukuran ikon default di dalam tombol */
+  .btn-primary i,
+  .btn-secondary i,
+  .btn-ghost i,
+  .btn-danger i,
+  .btn-icon i,
+  .btn-primary svg,
+  .btn-secondary svg,
+  .btn-ghost svg,
+  .btn-danger svg,
+  .btn-icon svg { 
+    width: 16px;
+    height: 16px;
+    font-size: 16px; 
+  }
+
+  /* ── Primary ── */
+  .btn-primary {
+    padding: 0 1rem;
+    height: 38px; /* Disinkronkan dengan tinggi .form-input */
+    background: var(--accent);
+    color: #ffffff;
+    border: 1px solid var(--accent);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-primary:hover {
+    background: var(--accent-light);
+    border-color: var(--accent-light);
+    box-shadow: var(--shadow-md);
+  }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-primary:focus-visible {
+    outline: 2px solid var(--accent-light);
+    outline-offset: 2px;
+  }
+
+  /* ── Secondary (White / Netral) ── */
+  .btn-secondary {
+    padding: 0 1rem;
+    height: 38px;
+    background: var(--bg-1); /* Putih bersih */
+    color: var(--text-1);
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-secondary:hover {
+    background: var(--bg-2);
+    color: var(--accent);
+    border-color: var(--accent-soft); /* Menggunakan token yang tersedia */
+  }
+  .btn-secondary:active { transform: scale(0.98); }
+
+  /* ── Ghost — minimal, tanpa border ── */
+  .btn-ghost {
+    padding: 0 0.75rem;
+    height: 38px;
+    background: transparent;
+    color: var(--text-2);
+    border: 1px solid transparent;
+  }
+  .btn-ghost:hover {
+    background: var(--bg-2);
+    color: var(--text-1);
+  }
+  .btn-ghost:active { transform: scale(0.98); }
+
+  /* ── Danger (Soft Red) ── */
+  .btn-danger {
+    padding: 0 1rem;
+    height: 38px;
+    background: var(--error-dim);
+    color: var(--error);
+    border: 1px solid var(--error-soft);
+  }
+  .btn-danger:hover {
+    background: var(--error);
+    color: #ffffff; /* Balik menjadi solid red dengan teks putih saat di-hover */
+    border-color: var(--error);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-danger:active { transform: scale(0.98); }
+
+  /* ── Icon Button ── */
+  .btn-icon {
+    width: 38px; /* Menyesuaikan proporsi 1:1 dengan tinggi */
+    height: 38px;
+    padding: 0;
+    background: var(--bg-1);
+    color: var(--text-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    position: relative;
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-icon:hover {
+    background: var(--bg-2);
+    color: var(--accent);
+    border-color: var(--accent-soft);
+  }
+  .btn-icon:active { transform: scale(0.95); }
+
+  /* Titik notifikasi pada icon button */
+  .btn-icon-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: var(--error);
+    border: 2px solid var(--bg-1);
+    border-radius: var(--r-full);
+  }
+
+  /* ── Modifier Ukuran ── */
+
+  .btn-xs {
+    height: 28px !important;
+    padding: 0 0.5rem !important;
+    font-size: 0.75rem !important; /* 12px */
+    border-radius: var(--r-sm) !important;
+    gap: 4px !important;
+  }
+  .btn-xs i, .btn-xs svg { 
+    width: 14px; height: 14px; font-size: 14px !important; 
+  }
+
+  .btn-sm {
+    height: 32px !important;
+    padding: 0 0.75rem !important;
+    font-size: 0.8125rem !important; /* 13px */
+  }
+  .btn-sm i, .btn-sm svg { 
+    width: 15px; height: 15px; font-size: 15px !important; 
+  }
+
+  .btn-lg {
+    height: 44px !important; /* Standar area klik minimum yang nyaman */
+    padding: 0 1.5rem !important;
+    font-size: 0.9375rem !important; /* 15px */
+    border-radius: var(--r-lg) !important;
+    gap: 0.5rem !important;
+  }
+  .btn-lg i, .btn-lg svg { 
+    width: 18px; height: 18px; font-size: 18px !important; 
+  }
+
+  /* ── Button Group ── */
+  .btn-group {
+    display: inline-flex;
+    align-items: center;
+  }
+  .btn-group > * { border-radius: 0; }
+  .btn-group > *:first-child {
+    border-radius: var(--r-md) 0 0 var(--r-md);
+  }
+  .btn-group > *:last-child {
+    border-radius: 0 var(--r-md) var(--r-md) 0;
+  }
+  /* Mengatasi border ganda (double-thick) di button group */
+  .btn-group > *:not(:first-child) {
+    margin-left: -1px;
+  }
+  .btn-group > *:hover,
+  .btn-group > *:focus-visible {
+    z-index: 1; /* Memastikan border elemen yang di-hover berada di atas elemen lain */
+  }
+}

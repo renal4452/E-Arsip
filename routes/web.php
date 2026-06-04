@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SharedDocumentController;
 use App\Http\Controllers\CategoryManagerController;
+use App\Http\Controllers\NotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -157,6 +158,36 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/shared-documents/{sharedDocument}', [SharedDocumentController::class, 'destroy'])
             ->name('shared_documents.destroy');
     });
+
+    Route::prefix('notifications')->middleware('auth')->group(function () {
+        Route::get('/recent',   [NotificationController::class, 'recent']);
+        Route::get('/count',    [NotificationController::class, 'count']);  
+        Route::post('/{id}/read', [NotificationController::class, 'markRead']);
+        Route::post('/read-all',  [NotificationController::class, 'markAllRead']);
+        Route::get('/',           [NotificationController::class, 'index'])->name('notifications.index');
+
+    });
+    Route::get('/notifications/dropdown', function () {
+
+    return auth()->user()
+        ->unreadNotifications()
+        ->latest()
+        ->take(10)
+        ->get();
+
+    })->middleware('auth');
+
+    Route::post('/notifications/read-all', function () {
+
+    auth()->user()
+        ->unreadNotifications()
+        ->update([
+            'read_at' => now()
+        ]);
+
+    return back();
+
+    })->middleware('auth')->name('notifications.readAll');
 
 });
 

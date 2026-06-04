@@ -1,76 +1,37 @@
+/**
+ * app.css — Entry Point Utama
+ * ═══════════════════════════════════════════════════
+ * Warm Industrial Dark Design System
+ * Tailwind v4 · Dipisah per tanggung jawab
+ *
+ * Urutan import penting:
+ *   Base       → reset, tokens, body
+ *   Layout     → shell, sidebar, header
+ *   Components → konten, notif, tombol, form, data
+ *   Utilities  → helper composable
+ *
+ * Untuk menambah komponen baru:
+ *   1. Buat file di folder components/
+ *   2. Tambahkan @import di bawah
+ * ═══════════════════════════════════════════════════
+ */
 @import "tailwindcss";
 
-/* =========================================
-   KONFIGURASI TEMA KUSTOM (TAILWIND V4)
-   ========================================= */
-@theme {
-  /* Mendaftarkan class utilitas baru: animate-fade-in-down */
-  --animate-fade-in-down: fade-in-down 0.3s ease-out forwards;
+/* ── Base ── */
+@import "./base/tokens.css";
+@import "./base/base.css";
 
-  /* Membuat keyframes untuk animasinya */
-  @keyframes fade-in-down {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
+/* ── Layout ── */
+@import "./layout/layout.css";
 
-@layer components {
-    /* =========================================
-       1. KARTU & KOTAK (CARDS & CONTAINERS)
-       ========================================= */
-    .card-base {
-        @apply bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden;
-    }
-    .card-stat {
-        @apply bg-white p-6 rounded-2xl shadow-sm border flex items-center justify-between transition-all duration-300 hover:shadow-md hover:-translate-y-1;
-    }
-    .layout-container {
-        @apply space-y-6 max-w-7xl mx-auto pb-10 px-4 sm:px-6 lg:px-8;
-    }
+/* ── Components ── */
+@import "./components/notification.css";
+@import "./components/content.css";
+@import "./components/buttons.css";
+@import "./components/forms.css";
+@import "./components/data-display.css";
+@import "./components/progress.css";
+@import "./components/scrollbar.css";
 
-    /* =========================================
-       2. TOMBOL (BUTTONS)
-       ========================================= */
-    .btn-primary {
-        @apply px-6 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2;
-    }
-    .btn-secondary {
-        @apply px-6 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm inline-flex items-center justify-center gap-2;
-    }
-    .btn-danger {
-        @apply px-4 py-2 bg-rose-50 border border-rose-100 text-rose-600 rounded-lg text-sm font-bold hover:bg-rose-100 transition-colors inline-flex items-center justify-center gap-2;
-    }
-
-    /* =========================================
-       3. FORMULIR (FORMS)
-       ========================================= */
-    .form-label {
-        @apply block text-sm font-bold text-slate-700 mb-1;
-    }
-    .form-input {
-        @apply w-full rounded-lg bg-slate-50 text-sm py-2.5 border-slate-300 transition-colors focus:bg-white focus:ring-indigo-500 focus:border-indigo-500;
-    }
-    .form-input-error {
-        @apply border-rose-300 focus:ring-rose-500 focus:border-rose-500 bg-rose-50;
-    }
-    /* Class ini sekarang akan bekerja sempurna! */
-    .form-error-text {
-        @apply mt-1.5 text-xs font-bold text-rose-600 animate-fade-in-down;
-    }
-
-    /* =========================================
-       4. BADGE STATUS
-       ========================================= */
-    .badge {
-        @apply px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border shadow-sm inline-flex items-center;
-    }
-    .badge-pending { @apply bg-amber-50 text-amber-700 border-amber-200; }
-    .badge-revisi { @apply bg-rose-50 text-rose-700 border-rose-200; }
-    .badge-approved { @apply bg-emerald-50 text-emerald-700 border-emerald-200; }
-}
+/* ── Utilities ── */
+@import "./utilities/utilities.css";

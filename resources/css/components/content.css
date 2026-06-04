@@ -1,0 +1,487 @@
+/**
+ * content.css — Kartu, Flash, Notifikasi (Optimasi Light Mode & Gov UI)
+ * ─────────────────────────────────────────────────────────
+ * Prinsip:
+ * • Kartu menggunakan latar putih bersih dengan border sangat tipis.
+ * • Flash/Alert disesuaikan kontrasnya agar lolos uji aksesibilitas (A11y).
+ * • Dropdown notifikasi dibuat lebih tajam dan clean.
+ * ─────────────────────────────────────────────────────────
+ * Bergantung pada: tokens.css, base.css
+ */
+
+@layer components {
+
+  /* ════════════════════════════════════════
+     KARTU DASAR (Clean & Professional)
+     ════════════════════════════════════════ */
+
+  /* Kartu universal */
+  .card {
+    background: var(--bg-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .card:hover { 
+    border-color: var(--accent-soft); 
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Header kartu */
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+
+  .card-header-info { flex: 1; min-width: 0; }
+
+  .card-title {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  .card-subtitle {
+    font-size: 0.6875rem; /* 11px */
+    color: var(--text-3);
+    margin-top: 2px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    letter-spacing: 0;
+  }
+
+  .card-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+    margin-left: 0.75rem;
+  }
+
+  /* Body kartu */
+  .card-body {
+    padding: 1rem;
+    background: var(--bg-1);
+  }
+
+  /* Footer kartu */
+  .card-footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+
+  /* ── Kartu Statistik (Dashboard Inspektorat) ── */
+  .card-stat {
+    background: var(--bg-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-xl);
+    padding: 1rem;
+    box-shadow: var(--shadow-sm);
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.2s var(--ease-out);
+  }
+  .card-stat:hover {
+    border-color: var(--accent-light);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+
+  /* Header stat: ikon + tren */
+  .stat-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Ikon latar per semantic (Light mode friendly) */
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--r-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .stat-icon-amber  { background: #fef3c7; color: #d97706; } /* Warning */
+  .stat-icon-green  { background: var(--success-dim);  color: var(--success); }
+  .stat-icon-red    { background: var(--error-dim);    color: var(--error); }
+  .stat-icon-blue   { background: #eff6ff; color: #2563eb; } /* Info/Blue */
+
+  /* Chip tren */
+  .stat-trend {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.6875rem; /* 11px */
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+  }
+  .stat-trend-up   { color: var(--success); background: var(--success-dim); }
+  .stat-trend-down { color: var(--error);   background: var(--error-dim); }
+  .stat-trend-flat { color: var(--text-2);   background: var(--bg-2); }
+
+  .stat-value {
+    font-size: 1.75rem; /* 28px */
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.75rem; /* 12px */
+    color: var(--text-2);
+    margin-top: 0.5rem;
+  }
+
+  /* Mini sparkline placeholder */
+  .stat-sparkline {
+    margin-top: 0.75rem;
+    height: 32px;
+    border-radius: var(--r-xs);
+    background: var(--bg-2);
+    overflow: hidden;
+  }
+
+
+  /* ── Kartu Beraksent (Garis Samping/Atas) ── */
+  .card-accent-left {
+    border-left: 4px solid var(--accent);
+    border-radius: 0 var(--r-xl) var(--r-xl) 0;
+    padding-left: calc(1rem - 4px);
+  }
+
+  .card-accent-top {
+    position: relative;
+  }
+  .card-accent-top::before {
+    content: '';
+    position: absolute;
+    inset-x: 0;
+    top: 0;
+    height: 3px;
+    background: var(--accent);
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+  }
+
+
+  /* ════════════════════════════════════════
+     FLASH / ALERT (Perbaikan Kontras Tinggi)
+     ════════════════════════════════════════ */
+
+  .flash {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: var(--r-lg);
+    border: 1px solid;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.5;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Varian semantic dengan teks gelap agar lolos WCAG Contrast AAA */
+  .flash-success {
+    background: var(--success-dim);
+    border-color: #a7f3d0; /* Emerald 200 */
+    color: #064e3b; /* Hijau hutan pekat */
+  }
+  .flash-error {
+    background: var(--error-dim);
+    border-color: var(--error-soft);
+    color: #7f1d1d; /* Merah marun pekat */
+  }
+  .flash-warning {
+    background: #fef3c7; /* Amber 100 */
+    border-color: #fde68a; /* Amber 200 */
+    color: #78350f; /* Cokelat/Amber pekat */
+  }
+  .flash-info {
+    background: #e0f2fe; /* Sky 100 */
+    border-color: #bae6fd; /* Sky 200 */
+    color: #0c4a6e; /* Biru samudera pekat */
+  }
+
+  /* Ikon latar lingkaran */
+  .flash-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    font-size: 11px;
+    color: #ffffff !important;
+  }
+  .flash-success .flash-icon { background: var(--success); }
+  .flash-error   .flash-icon { background: var(--error); }
+  .flash-warning .flash-icon { background: #f59e0b; } /* Amber 500 */
+  .flash-info    .flash-icon { background: #0ea5e9; } /* Sky 500 */
+
+  .flash-body { flex: 1; }
+
+  .flash-title {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .flash-msg {
+    font-size: 0.8125rem; /* 13px */
+    opacity: 0.9;
+  }
+
+  .flash-close {
+    background: none;
+    border: none;
+    padding: 2px;
+    cursor: pointer;
+    border-radius: var(--r-xs);
+    font-size: 14px;
+    opacity: 0.6;
+    transition: opacity 0.15s, background-color 0.15s;
+    color: inherit;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .flash-close:hover { 
+    opacity: 1; 
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+
+
+  /* ════════════════════════════════════════
+     NOTIFIKASI (Clean Dropdown)
+     ════════════════════════════════════════ */
+
+  /* Tombol lonceng */
+  .notif-bell {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-md);
+    color: var(--text-2);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s var(--ease-smooth);
+  }
+  .notif-bell:hover {
+    color: var(--accent-light);
+    background: var(--accent-dim);
+    border-color: var(--accent-soft);
+  }
+
+  /* Titik unread */
+  .notif-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: var(--error);
+    border: 2px solid var(--bg-1);
+    border-radius: var(--r-full);
+  }
+
+  /* Badge angka */
+  .notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    background: var(--error);
+    color: #ffffff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-full);
+    padding: 0 4px;
+    border: 2px solid var(--bg-1);
+    letter-spacing: 0;
+  }
+
+  /* Dropdown panel */
+  .notif-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.5rem);
+    width: 360px;
+    background: var(--bg-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    transform-origin: top right;
+    /* Tambahan fallback jika animasi scale-in belum ada */
+    animation: scale-in 0.2s var(--ease-out) forwards;
+    z-index: 50;
+  }
+
+  .notif-dropdown-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .notif-dropdown-title {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    color: var(--text-1);
+    letter-spacing: -0.015em;
+  }
+
+  .notif-mark-read {
+    background: none;
+    border: none;
+    color: var(--accent-light);
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.15s;
+    letter-spacing: -0.01em;
+  }
+  .notif-mark-read:hover { color: var(--accent); }
+
+  .notif-list { max-height: 360px; overflow-y: auto; }
+
+  /* Item Notifikasi */
+  .notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+    text-decoration: none;
+    background: var(--bg-1);
+  }
+  .notif-item.unread {
+    background: var(--accent-dim);
+  }
+  .notif-item:hover { background: var(--bg-2); }
+  .notif-item:last-child { border-bottom: none; }
+
+  .notif-unread-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-light);
+    border-radius: var(--r-full);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .notif-item-text {
+    font-size: 0.8125rem; /* 13px */
+    color: var(--text-1);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+  .notif-item.unread .notif-item-text {
+    font-weight: 600;
+  }
+
+  .notif-item-time {
+    font-size: 0.6875rem; /* 11px */
+    color: var(--text-3);
+    margin-top: 4px;
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    letter-spacing: 0;
+  }
+
+  /* Empty state */
+  .notif-empty {
+    padding: 3rem 1.5rem;
+    text-align: center;
+    background: var(--bg-1);
+  }
+  .notif-empty-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    font-size: 22px;
+    color: var(--text-3);
+  }
+  .notif-empty-title {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 600;
+    color: var(--text-1);
+  }
+  .notif-empty-sub {
+    font-size: 0.75rem; /* 12px */
+    color: var(--text-3);
+    margin-top: 4px;
+  }
+
+  /* Spinner loading */
+  .notif-spinner-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    color: var(--text-3);
+    font-size: 0.8125rem; /* 13px */
+    background: var(--bg-1);
+  }
+  .notif-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--bg-3);
+    border-top-color: var(--accent-light);
+    border-radius: var(--r-full);
+    animation: spin 0.7s linear infinite;
+  }
+
+  /* Keyframes (Jika belum ada di base) */
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+}

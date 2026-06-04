@@ -1,0 +1,465 @@
+/**
+ * header.css — Komponen Header & Notifikasi (Gov UI Light Mode)
+ * ─────────────────────────────────────────────────────────
+ * Styling untuk:
+ * • .app-header          — bar utama sticky (putih bersih)
+ * • .header-sep          — pemisah vertikal tipis
+ * • .header-page-meta    — judul (diperbesar) + breadcrumb
+ * • .header-date-chip    — chip tanggal
+ * • .header-icon-btn     — tombol ikon (search, bell)
+ * • .notif-bell-wrap     — wrapper posisi relatif
+ * • .notif-dropdown      — panel dropdown notifikasi
+ * • .notif-item          — baris notifikasi
+ *
+ * Bergantung pada: tokens.css, base.css
+ * ─────────────────────────────────────────────────────────
+ */
+
+@layer components {
+
+  /* ════════════════════════════════════════
+     APP HEADER
+     ════════════════════════════════════════ */
+
+  .app-header {
+    height: 64px;                      /* Standar tinggi header */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    background: var(--bg-1);           /* Wajib putih solid */
+    border-bottom: 1px solid var(--border-strong);
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+
+  .header-left,
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  /* Pemisah vertikal tipis */
+  .header-sep {
+    width: 1px;
+    height: 24px;
+    background: var(--border);
+    margin: 0 0.5rem;
+    flex-shrink: 0;
+  }
+
+
+  /* ── Judul & Breadcrumb di header ── */
+  .header-page-meta {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .header-page-title {
+    font-size: 1rem; /* 16px */
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    font-family: inherit;
+  }
+
+  .header-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.6875rem; /* 11px */
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    color: var(--text-3);
+    margin-top: 4px;
+    line-height: 1;
+  }
+
+  .header-breadcrumb a {
+    color: var(--text-2);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+  .header-breadcrumb a:hover      { color: var(--accent); }
+  .header-breadcrumb-sep          { color: var(--border-strong); }
+  .header-breadcrumb-current      { color: var(--text-1); font-weight: 600; }
+
+
+  /* ── Chip tanggal ── */
+  .header-date-chip {
+    display: none;               /* Sembunyi di mobile */
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-full);
+    padding: 6px 1rem;
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text-2);
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+  }
+  .header-date-chip i,
+  .header-date-chip svg {
+    color: var(--accent);
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+  @media (min-width: 1024px) {
+    .header-date-chip { display: flex; }
+  }
+
+
+  /* ── Tombol ikon (search, bell, dll.) ── */
+  .header-icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-2);
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s ease-out;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .header-icon-btn i,
+  .header-icon-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .header-icon-btn:hover,
+  .header-icon-btn--active {
+    color: var(--accent);
+    background: var(--bg-3);
+    border-color: var(--accent-soft);
+  }
+  .header-icon-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Hamburger — hanya tampil di bawah lg */
+  .hamburger-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border);
+    background: var(--bg-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-2);
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .hamburger-btn i,
+  .hamburger-btn svg { width: 18px; height: 18px; }
+
+  .hamburger-btn:hover {
+    color: var(--text-1);
+    background: var(--bg-3);
+  }
+  @media (min-width: 1024px) {
+    .hamburger-btn { display: none; }
+  }
+
+
+  /* ════════════════════════════════════════
+     NOTIFIKASI — BADGE DI TOMBOL
+     ════════════════════════════════════════ */
+
+  .notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    background: var(--error);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.625rem; /* 10px */
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-full);
+    padding: 0 4px;
+    border: 2px solid var(--bg-1);
+    pointer-events: none;
+    box-shadow: var(--shadow-sm);
+  }
+
+
+  /* ════════════════════════════════════════
+     NOTIFIKASI — DROPDOWN PANEL
+     ════════════════════════════════════════ */
+
+  .notif-bell-wrap { position: relative; }
+
+  .notif-dropdown {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.75rem);
+    width: 360px;
+    background: var(--bg-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-xl);
+    transform-origin: top right;
+    z-index: 50;
+  }
+
+  /* Transisi Alpine */
+  .notif-enter        { transition: opacity 0.15s ease-out, transform 0.15s ease-out; }
+  .notif-enter-start  { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  .notif-enter-end    { opacity: 1; transform: scale(1) translateY(0); }
+  .notif-leave        { transition: opacity 0.1s ease, transform 0.1s ease; }
+
+
+  /* ── Header dropdown ── */
+  .notif-dropdown-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-2);
+  }
+
+  .notif-dropdown-head-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .notif-dropdown-title {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -0.01em;
+  }
+
+  .notif-unread-chip {
+    font-family: inherit;
+    font-size: 0.625rem; /* 10px */
+    font-weight: 700;
+    background: var(--error-dim);
+    color: #991b1b;
+    border-radius: var(--r-full);
+    padding: 2px 8px;
+  }
+
+  .notif-mark-read-btn {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.75rem; /* 12px */
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: opacity 0.15s;
+    padding: 0;
+  }
+  .notif-mark-read-btn:hover    { opacity: 0.75; text-decoration: underline; }
+  .notif-mark-read-btn:disabled { opacity: 0.35; cursor: default; text-decoration: none; }
+
+
+  /* ── Daftar & Loading ── */
+  .notif-list {
+    max-height: 360px;
+    overflow-y: auto;
+  }
+
+  .notif-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    color: var(--text-3);
+    font-size: 0.8125rem; /* 13px */
+  }
+
+  .notif-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: var(--r-full);
+    animation: spin 0.7s linear infinite;
+  }
+
+
+  /* ── Item notifikasi ── */
+  .notif-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 12px 1rem;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    transition: background 0.12s;
+    cursor: pointer;
+    background: var(--bg-1);
+  }
+  .notif-item:hover { background: var(--bg-2); }
+  .notif-item:last-child { border-bottom: none; }
+
+  /* Latar item yang belum dibaca */
+  .notif-item--unread {
+    background: #e0f2fe; /* Light Blue 100 */
+  }
+  .notif-item--unread:hover { background: #bae6fd; /* Light Blue 200 */ }
+
+
+  /* ── Ikon semantik per tipe ── */
+  .notif-item-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .notif-icon--green { background: var(--success-dim); color: #166534; }
+  .notif-icon--amber { background: #fef3c7; color: #9a3412; }
+  .notif-icon--red   { background: var(--error-dim);   color: #991b1b; }
+  .notif-icon--blue  { background: #e0f2fe;            color: #1e40af; }
+
+
+  /* ── Body teks ── */
+  .notif-item-body { flex: 1; min-width: 0; }
+
+  .notif-item-msg {
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 500;
+    color: var(--text-1);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .notif-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .notif-item-time {
+    font-size: 0.6875rem; /* 11px */
+    font-family: inherit;
+    color: var(--text-3);
+  }
+
+  /* Badge tipe kecil */
+  .notif-item-type-badge {
+    font-family: inherit;
+    font-size: 0.625rem; /* 10px */
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: var(--r-xs);
+  }
+  .notif-badge--green { background: var(--success-dim); color: #166534; }
+  .notif-badge--amber { background: #fef3c7; color: #9a3412; }
+  .notif-badge--red   { background: var(--error-dim);   color: #991b1b; }
+  .notif-badge--blue  { background: #e0f2fe;            color: #1e40af; }
+
+  /* Titik unread */
+  .notif-unread-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: var(--r-full);
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+
+  /* ── Empty state ── */
+  .notif-empty {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    background: var(--bg-1);
+  }
+
+  .notif-empty-icon {
+    width: 48px;
+    height: 48px;
+    background: var(--bg-2);
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--r-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.75rem;
+    font-size: 20px;
+    color: var(--text-3);
+  }
+
+  .notif-empty-title {
+    font-size: 0.875rem; /* 14px */
+    font-weight: 700;
+    color: var(--text-1);
+    margin-bottom: 4px;
+  }
+  .notif-empty-sub { font-size: 0.75rem; color: var(--text-3); line-height: 1.5; }
+
+
+  /* ── Footer dropdown ── */
+  .notif-dropdown-foot {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+
+  .notif-see-all-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 8px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: var(--r-md);
+    color: var(--text-2);
+    font-size: 0.8125rem; /* 13px */
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .notif-see-all-btn:hover {
+    color: var(--accent);
+    background: #e0f2fe; 
+    border-color: #bae6fd;
+  }
+  .notif-see-all-btn i,
+  .notif-see-all-btn svg { 
+    font-size: 14px; 
+    width: 14px; 
+    height: 14px; 
+    transition: transform 0.15s; 
+  }
+  .notif-see-all-btn:hover i,
+  .notif-see-all-btn:hover svg { transform: translateX(3px); }
+}
