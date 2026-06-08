@@ -8,7 +8,8 @@
         <h1 class="page-title text-2xl font-bold text-slate-900 tracking-tight">Inspektorat Dashboard</h1>
         <p class="page-subtitle text-sm text-slate-500 mt-1 flex items-center gap-2">
           <i class="bi bi-speedometer2"></i>
-          Real-time monitoring & analytics sistem inspeksi dokumen
+          Selamat datang kembali, <span class="font-semibold text-slate-700">{{ auth()->user()->name }}</span> 
+          ({{ auth()->user()->division_id ? auth()->user()->division->name : 'Semua Divisi' }})
         </p>
       </div>
 
@@ -44,7 +45,7 @@
       </div>
     @endif
 
-    {{-- SECTION 1: KEY METRICS (Telah Diperbaiki: Layout & Keseimbangan Visual) --}}
+    {{-- SECTION 1: KEY METRICS --}}
     <div class="mb-8">
       <div class="flex items-center gap-2 mb-4">
         <i class="bi bi-graph-up text-blue-600"></i>
@@ -65,8 +66,7 @@
             </div>
           </div>
           <div class="mt-4 inline-flex items-center gap-1 text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-md px-2 py-1">
-            <i class="bi bi-arrow-up-short text-sm"></i>
-            +{{ round(($stats['total'] / max($stats['total'], 1)) * 100) }}% bulan ini
+            <i class="bi bi-arrow-up-short text-sm"></i> Berkas Aktif
           </div>
         </a>
 
@@ -124,7 +124,7 @@
     {{-- SECTION 2: STATUS & RECENT DOCS --}}
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       
-      {{-- Status Distribution (Telah Diperbaiki: Bar lebih tipis dan rapi) --}}
+      {{-- Status Distribution --}}
       <div class="section-wrapper bg-white border border-slate-200 rounded-xl overflow-hidden lg:col-span-1">
         <div class="section-header px-6 py-4 border-b border-slate-100 flex items-center justify-between">
           <h6 class="font-bold text-slate-800 text-sm">Distribusi Status</h6>
@@ -190,7 +190,7 @@
         </div>
       </div>
 
-      {{-- Recent Documents (Telah Diperbaiki: Kontras teks & Alignment vertikal) --}}
+      {{-- Recent Documents --}}
       <div class="section-wrapper bg-white border border-slate-200 rounded-xl overflow-hidden lg:col-span-2 flex flex-col">
         <div class="section-header px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
           <h6 class="font-bold text-slate-800 text-sm">Aktivitas Dokumen Terbaru</h6>
@@ -214,14 +214,13 @@
                       <p class="text-sm font-bold text-slate-800 truncate group-hover:text-blue-600 transition-colors">
                         {{ $doc->title }}
                       </p>
-                      {{-- Kontras teks ditingkatkan ke text-slate-500 --}}
+                      {{-- FIXED: name diganti ke name_types sesuai dengan database seeder --}}
                       <p class="text-[11px] font-medium text-slate-500 mt-0.5 truncate">
-                        {{ $doc->division->name ?? '-' }} <span class="mx-1.5 text-slate-300">•</span> {{ $doc->docType->name ?? 'Dokumen' }}
+                        {{ $doc->division->name ?? '-' }} <span class="mx-1.5 text-slate-300">•</span> {{ $doc->docType->name_types ?? 'Dokumen' }}
                       </p>
                     </div>
                   </div>
 
-                  {{-- Memastikan Badge dan Waktu Rata Tengah secara Vertikal --}}
                   <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 shrink-0 text-right">
                     @php
                       $badgeClass = match($doc->status) {
@@ -241,7 +240,6 @@
                     <span class="inline-flex items-center justify-center px-2 py-0.5 border rounded text-[10px] font-bold uppercase tracking-wider {{ $badgeClass }}">
                       {{ $badgeLabel }}
                     </span>
-                    {{-- Waktu digelapkan sedikit --}}
                     <span class="text-[11px] font-medium text-slate-500 sm:w-20 sm:text-right whitespace-nowrap">
                       {{ $doc->created_at->diffForHumans() }}
                     </span>
@@ -289,6 +287,7 @@
           </div>
         </a>
 
+        {{-- Laporan Audit --}}
         <div class="card-base bg-slate-50 border border-slate-200 rounded-xl p-4 opacity-70 cursor-not-allowed relative overflow-hidden flex items-center gap-4">
           <div class="w-12 h-12 rounded-xl bg-slate-200 text-slate-400 flex items-center justify-center text-xl">
             <i class="bi bi-pie-chart-fill"></i>
@@ -302,18 +301,32 @@
           </div>
         </div>
 
-        <div class="card-base bg-slate-50 border border-slate-200 rounded-xl p-4 opacity-70 cursor-not-allowed relative overflow-hidden flex items-center gap-4">
-          <div class="w-12 h-12 rounded-xl bg-slate-200 text-slate-400 flex items-center justify-center text-xl">
-            <i class="bi bi-gear-fill"></i>
+        {{-- Pengaturan Sistem (FITUR DINAMIS: Terbuka khusus untuk Superadmin ID 1 dan Admin ID 2) --}}
+        @if(in_array(auth()->user()->role_id, [1, 2]))
+          <a href="#" class="card-base bg-white border border-slate-200 rounded-xl p-4 hover:shadow-md hover:border-gear-300 transition-all flex items-center gap-4 group">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-xl group-hover:scale-105 group-hover:bg-slate-800 group-hover:text-white transition-all">
+              <i class="bi bi-gear-fill"></i>
+            </div>
+            <div>
+              <h6 class="font-bold text-slate-800 text-sm group-hover:text-slate-900 transition-colors">Pengaturan</h6>
+              <p class="text-xs text-slate-500 mt-0.5">Akses administrator</p>
+            </div>
+          </a>
+        @else
+          <div class="card-base bg-slate-50 border border-slate-200 rounded-xl p-4 opacity-70 cursor-not-allowed relative overflow-hidden flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-slate-200 text-slate-400 flex items-center justify-center text-xl">
+              <i class="bi bi-gear-fill"></i>
+            </div>
+            <div>
+              <h6 class="font-bold text-slate-600 text-sm">Pengaturan</h6>
+              <p class="text-xs text-slate-400 mt-0.5">Akses terbatas</p>
+            </div>
+            <div class="absolute top-3 right-3 text-slate-300">
+              <i class="bi bi-lock-fill text-xs"></i>
+            </div>
           </div>
-          <div>
-            <h6 class="font-bold text-slate-600 text-sm">Pengaturan</h6>
-            <p class="text-xs text-slate-400 mt-0.5">Akses administrator</p>
-          </div>
-          <div class="absolute top-3 right-3 text-slate-300">
-            <i class="bi bi-lock-fill text-xs"></i>
-          </div>
-        </div>
+        @endif
+
       </div>
     </div>
   </div>

@@ -11,11 +11,12 @@ class DocumentObserver
     public function created(Document $document)
     {
         ActivityLog::create([
-            'user_id' => auth()->id(), // Siapa yang lagi login
+            // PENGAMAN SEEDER: Jika auth()->id() null (saat seeder berjalan), otomatis pakai ID 1 (Superadmin)
+            'user_id' => auth()->id() ?? 1, 
             'document_id' => $document->id,
             'action' => 'create_draft',
             'description' => 'Mengunggah draf LHP baru.',
-            'ip_address' => request()->ip()
+            'ip_address' => request()->ip() ?? '127.0.0.1'
         ]);
     }
 
@@ -31,11 +32,12 @@ class DocumentObserver
             $desc = $status === 'approved' ? 'Inspektur memberikan ACC.' : ($status === 'revisi' ? 'Inspektur meminta revisi.' : 'Status dokumen diperbarui.');
 
             ActivityLog::create([
-                'user_id' => auth()->id(),
+                // PENGAMAN SEEDER
+                'user_id' => auth()->id() ?? 1,
                 'document_id' => $document->id,
                 'action' => $action,
                 'description' => $desc,
-                'ip_address' => request()->ip()
+                'ip_address' => request()->ip() ?? '127.0.0.1'
             ]);
         }
     }
@@ -44,11 +46,12 @@ class DocumentObserver
     public function deleted(Document $document)
     {
         ActivityLog::create([
-            'user_id' => auth()->id(),
+            // PENGAMAN SEEDER
+            'user_id' => auth()->id() ?? 1,
             'document_id' => $document->id,
             'action' => 'delete_document',
             'description' => 'Menghapus dokumen permanen.',
-            'ip_address' => request()->ip()
+            'ip_address' => request()->ip() ?? '127.0.0.1'
         ]);
     }
 }

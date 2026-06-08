@@ -31,14 +31,22 @@ class DocumentController extends Controller
     }
 
     /**
-     * Menampilkan daftar dokumen dengan filter.
+     * Menampilkan daftar dokumen dengan filter (Pengecualian untuk Superadmin & Inspektur).
      */
     public function index(Request $request): View
     {
+        
         $filters = $request->only(['search', 'status', 'year', 'type', 'start_date', 'end_date']);
         $viewMode = $request->get('view', 'folder');
+        
+        $user = $request->user();
 
         $query = Document::with(['docType', 'division', 'latestVersion'])
+            // PENGAMAN & PENGECUALIAN:
+            // Jika BUKAN Superadmin (1) DAN BUKAN Inspektur (3), saring berdasarkan divisi
+            ->when(!in_array($user->role_id, [1, 3]), function ($query) use ($user) {
+                return $query->where('division_id', $user->division_id);
+            })
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('no_doc', 'like', "%{$search}%")
@@ -63,19 +71,35 @@ class DocumentController extends Controller
 
         $categories = DocType::all();
 
+        // Statistik juga menyesuaikan hak akses role_id
+        $statsQueryPending = Document::where('status', 'pending');
+        $statsQueryApproved = Document::where('status', 'approved');
+
+        if (!in_array($user->role_id, [1, 3])) {
+            $statsQueryPending->where('division_id', $user->division_id);
+            $statsQueryApproved->where('division_id', $user->division_id);
+        }
+
         $stats = [
-            'pending' => Document::where('status', 'pending')->count(),
-            'approved' => Document::where('status', 'approved')->count(),
+            'pending' => $statsQueryPending->count(),
+            'approved' => $statsQueryApproved->count(),
         ];
 
         return view('documents.index', compact('documents', 'categories', 'stats', 'filters', 'viewMode'));
     }
 
     /**
-     * Menampilkan detail dokumen, log aktivitas, dan riwayat versi.
+     * Menampilkan detail dokumen.
      */
-    public function show(Document $document): View
+    public function show(Document $document, Request $request): View
     {
+        $user = $request->user();
+
+        // Buka akses jika dia Superadmin (1) / Inspektur (3). Jika bukan, cek kesamaan divisi.
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen divisi ini.');
+        }
+
         $document->load(['docType', 'division', 'auditor']);
         $versions = $document->versions()->with('uploader')->latest()->get();
         $logs = $document->activityLogs()->with('user')->latest()->get();
@@ -102,10 +126,15 @@ class DocumentController extends Controller
     }
 
     /**
-     * Menampilkan form revisi dokumen (Untuk mengatasi error GET /documents/{id}/revisi).
+     * Menampilkan form revisi dokumen.
      */
-    public function revisiForm(Document $document): View
+    public function revisiForm(Document $document, Request $request): View
     {
+        $user = $request->user();
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen divisi ini.');
+        }
+
         Gate::authorize('review', $document);
         $document->load(['docType', 'division']);
 
@@ -113,30 +142,45 @@ class DocumentController extends Controller
     }
 
     /**
-     * Memproses penolakan dokumen dan menyimpan catatan revisi dari Auditor.
+     * Memproses penolakan dokumen.
      */
     public function storeRevisi(ReviewDocumentRequest $request, Document $document): RedirectResponse
     {
-        // Ubah $request->note menjadi $request->notes (pakai 's')
+        $user = $request->user();
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen divisi ini.');
+        }
+
         $this->workflowService->processRejection($document, $request->notes, $request->user());
         
         return redirect()->route('documents.show', $document->id)
             ->with('success', 'Dokumen berhasil diubah statusnya menjadi Perlu Revisi.');
     }
+
     /**
-     * Mengunggah file berkas draf perbaikan baru oleh User/Uploader.
+     * Mengunggah file berkas draf perbaikan baru.
      */
     public function updateRevision(UpdateRevisionRequest $request, Document $document): RedirectResponse
     {
+        $user = $request->user();
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen divisi ini.');
+        }
+
         $this->docService->uploadNewVersion($document, $request->file('file'), $request->user(), 'pending', null);
         return redirect()->route('documents.show', $document->id)->with('success', 'Revisi berhasil dikirim.');
     }
 
     /**
-     * Menyetujui dokumen (ACC) oleh Auditor/Pihak Berwenang.
+     * Menyetujui dokumen (ACC).
      */
     public function approve(Request $request, Document $document): RedirectResponse
     {
+        $user = $request->user();
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen divisi ini.');
+        }
+
         Gate::authorize('review', $document); 
         $this->workflowService->processApproval($document, $request->user());
         
@@ -144,10 +188,15 @@ class DocumentController extends Controller
     }
 
     /**
-     * Mengunggah berkas final yang telah ditandatangani secara elektronik (TTE).
+     * Mengunggah berkas final (TTE).
      */
     public function uploadFinalDocument(UploadFinalRequest $request, Document $document): RedirectResponse
     {
+        $user = $request->user();
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen divisi ini.');
+        }
+
         Gate::authorize('review', $document); 
 
         if (!$document->isApproved()) {
@@ -160,10 +209,15 @@ class DocumentController extends Controller
     }
 
     /**
-     * Memperbarui file berkas secara mandiri/paksa (Force Update).
+     * Memperbarui file berkas secara mandiri (Force Update).
      */
     public function forceUpdateFile(ForceUpdateRequest $request, Document $document): RedirectResponse
     {
+        $user = $request->user();
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen divisi ini.');
+        }
+
         Gate::authorize('forceUpdate', $document); 
 
         $this->docService->uploadNewVersion($document, $request->file('file'), $request->user(), 'pending', 'Diperbarui mandiri.');
@@ -174,15 +228,19 @@ class DocumentController extends Controller
     /**
      * Mengunduh berkas fisik berdasarkan ID versi dokumen.
      */
-    public function download($versionId)
+    public function download(Request $request, $versionId)
     {
         $document = Document::whereHas('versions', function($q) use ($versionId) {
             $q->where('id', $versionId);
         })->firstOrFail();
 
+        $user = $request->user();
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses untuk mengunduh dokumen divisi ini.');
+        }
+
         $version = $document->versions()->where('id', $versionId)->firstOrFail();
         
-        // Deteksi dinamis nama kolom penyimpanan file yang Anda gunakan
         $filePath = $version->file_path ?? $version->path ?? $version->file; 
 
         if (!$filePath) {
@@ -203,6 +261,11 @@ class DocumentController extends Controller
      */
     public function destroy(Request $request, Document $document): RedirectResponse
     {
+        $user = $request->user();
+        if (!in_array($user->role_id, [1, 3]) && $document->division_id !== $user->division_id) {
+            abort(403, 'Anda tidak memiliki akses ke dokumen divisi ini.');
+        }
+
         Gate::authorize('delete', $document); 
 
         if ($document->isLocked()) {

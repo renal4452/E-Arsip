@@ -8,7 +8,7 @@
     $items = $documents instanceof \Illuminate\Pagination\LengthAwarePaginator ? collect($documents->items()) : $documents;
 @endphp
 
-<div class="w-full max-w-7xl mx-auto" x-data="{ 
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" x-data="{ 
     filterOpen: {{ request()->hasAny(['year', 'type', 'start_date', 'end_date']) ? 'true' : 'false' }},
     activeFolder: null,
     folderName: '',
@@ -16,9 +16,9 @@
     forceUpdateModalOpen: false, forceUpdateFormAction: '', forceUpdateDocNumber: ''
 }">
 
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-slate-100 pb-5">
         <div>
-            <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight mb-1">Manajemen Dokumen</h3>
+            <h3 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-1">Manajemen Dokumen</h3>
             <p class="text-sm text-slate-500 font-medium">Pusat kendali draf LHP, Nota Dinas, dan riwayat persetujuan audit.</p>
         </div>
         <a href="{{ route('documents.create') }}" class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 shrink-0">
@@ -69,7 +69,7 @@
                 <a href="{{ request()->fullUrlWithQuery(['status' => 'approved']) }}" class="px-4 py-1.5 rounded-full text-xs font-bold transition-all duration-200 {{ request('status') == 'approved' ? 'bg-emerald-500 text-white shadow-md' : 'bg-slate-50 text-slate-600 border border-slate-200 hover:bg-slate-100 hover:text-slate-800' }}">Disetujui</a>
                 
                 <button @click="filterOpen = !filterOpen" class="ml-auto lg:ml-2 px-3 py-1.5 rounded-lg text-xs font-bold text-indigo-600 border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 transition-colors flex items-center gap-1">
-                    <i class="bi bi-sliders"></i> Filter
+                    <i class="bi bi-sliders"></i> Filter Lanjutan
                 </button>
             </div>
 
@@ -92,7 +92,7 @@
             </div>
         </div>
 
-        <div x-show="filterOpen" x-collapse>
+        <div x-show="filterOpen" x-collapse x-cloak>
             <hr class="border-slate-100 my-5">
             <form action="{{ route('documents.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
                 <input type="hidden" name="view" value="{{ $viewMode }}">
@@ -242,7 +242,7 @@
                                 <td class="px-6 py-4 text-center whitespace-nowrap">
                                     @if($doc->status == 'pending')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-lg text-xs font-bold tracking-wide">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> MENUNGGU ACC
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> MENUNGGU ACC
                                         </span>
                                     @elseif($doc->status == 'revisi')
                                         <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-700 border border-rose-200 rounded-lg text-xs font-bold tracking-wide">
@@ -372,7 +372,7 @@
              x-transition:leave-end="opacity-0 translate-y-8 sm:translate-y-0 sm:scale-95">
             
             <div class="px-6 py-4 bg-amber-50 border-b border-amber-200 flex justify-between items-center">
-                <h5 class="font-extrabold text-amber-800 flex items-center gap-2 text-lg"><i class="bi bi-cloud-upload text-xl"></i> Unggah Ulang Berkas</h5>
+                <h5 class="font-extrabold text-amber-800 flex items-center gap-2 text-lg"><i class="bi bi-cloud-upload text-xl"></i> Unggah Ulang Berkas (Revisi Baru)</h5>
                 <button @click="forceUpdateModalOpen = false" class="text-amber-500 hover:text-amber-800 transition-colors bg-amber-100 hover:bg-amber-200 w-8 h-8 rounded-full flex items-center justify-center">
                     <i class="bi bi-x-lg"></i>
                 </button>
@@ -382,15 +382,15 @@
                 <div class="p-6">
                     <div class="bg-amber-50/50 border border-amber-200 text-amber-800 text-sm p-4 rounded-xl mb-5 leading-relaxed">
                         Anda akan memperbarui dokumen No: <strong x-text="forceUpdateDocNumber" class="text-amber-900"></strong>.<br> 
-                        Tindakan ini akan mengembalikan status menjadi <strong class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-700">Menunggu ACC</strong> dan menaikkan versi dokumen secara otomatis.
+                        Tindakan ini akan otomatis menaikkan versi berkas saat ini dan mengembalikan status peninjauan berkas menjadi <strong class="bg-amber-100 px-1.5 py-0.5 rounded text-amber-700">Menunggu ACC</strong>.
                     </div>
                     <label class="block text-sm font-bold text-slate-700 mb-2">Pilih Berkas Baru <span class="text-rose-500">*</span></label>
-                    <input type="file" name="file" class="w-full text-sm text-slate-500 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 cursor-pointer file:mr-4 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:border-r file:border-slate-200 file:text-sm file:font-bold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100 transition-all shadow-sm" required accept=".pdf,.doc,.docx,.xls,.xlsx">
-                    <p class="mt-2 text-xs text-slate-500 font-medium"><i class="bi bi-info-circle"></i> Maksimal ukuran: 10MB. Format: PDF, Word, Excel.</p>
+                    <input type="file" name="file" class="w-full text-sm text-slate-500 border border-slate-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 cursor-pointer file:mr-4 file:py-2.5 file:px-4 file:rounded-l-xl file:border-0 file:border-r file:border-slate-200 file:text-sm file:font-bold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100 transition-all shadow-sm" required>
+                    <p class="mt-2 text-xs text-slate-500 font-medium"><i class="bi bi-info-circle"></i> Maksimal ukuran: 10MB. Gunakan format dokumen yang sesuai (PDF/Word/Excel).</p>
                 </div>
                 <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
                     <button type="button" @click="forceUpdateModalOpen = false" class="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:text-slate-900 transition-colors shadow-sm">Batal</button>
-                    <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all">Mulai Unggah</button>
+                    <button type="submit" class="px-5 py-2.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md hover:shadow-lg transition-all">Perbarui Berkas</button>
                 </div>
             </form>
         </div>
